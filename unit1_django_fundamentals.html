@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Unit 1 — Django Fundamentals</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/vs2015.min.css">
+<link rel="stylesheet" href="django-notes.css">
+</head>
+<body>
+<div class="page">
+
+  <div class="topbar">
+    <h1>Unit 1 — Django Fundamentals</h1>
+    <div class="meta">Architecture &amp; MVT &nbsp;•&nbsp; Virtual Envs &amp; Setup &nbsp;•&nbsp; App Structure &amp; Settings &nbsp;•&nbsp; URL Routing &amp; Views &nbsp;•&nbsp; Templates &amp; Context</div>
+  </div>
+
+  <div class="nav">
+    <a class="active" href="unit1_django_fundamentals.html">Unit 1 · Django Fundamentals</a>
+    <a href="unit2_models_migrations.html">Unit 2 · Models &amp; Migrations</a>
+    <a href="unit3_user_authentication.html">Unit 3 · User Authentication</a>
+  </div>
+
+  <!-- ============ TOPIC 1 ============ -->
+  <h2 class="qhead">1. Django Architecture and the MVC / MVT Design Pattern</h2>
+  <section class="q">
+    <p>Django is a high‑level Python web framework built around the <b>Model–View–Template (MVT)</b> architecture — Django's own take on the classic <b>Model–View–Controller (MVC)</b> pattern.<sup>[1]</sup> In MVC, the <i>Controller</i> is code you write to receive a request, talk to the Model, and choose a View. In Django, that dispatching job is handled internally by the framework itself (the URL dispatcher + the Django core), so what a Django developer calls a <b>"View"</b> actually plays the role of the MVC <i>Controller</i>, while a Django <b>"Template"</b> plays the role of the MVC <i>View</i>.</p>
+
+    <table>
+      <tr><th>MVC term</th><th>Django (MVT) equivalent</th><th>Responsibility</th></tr>
+      <tr><td>Model</td><td>Model (<code>models.py</code>)</td><td>Defines data structure; talks to the database via the ORM</td></tr>
+      <tr><td>Controller</td><td>View (<code>views.py</code>) + URL dispatcher</td><td>Receives the request, runs business logic, decides what to send back</td></tr>
+      <tr><td>View</td><td>Template (<code>.html</code> files)</td><td>Presentation layer — how data is displayed</td></tr>
+    </table>
+
+    <h3>Request–response cycle</h3>
+    <div class="diagram-box">
+      <svg viewBox="0 0 940 260" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Diagram: browser sends a request to urls.py, which dispatches to views.py; the view reads models.py and renders template.html; the HTML response flows back to the browser.">
+        <defs>
+          <marker id="a1" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#15803d"/></marker>
+        </defs>
+        <rect x="10" y="90" width="120" height="50" rx="8" fill="#eef4ff" stroke="#2563eb" stroke-width="1.6"/>
+        <text x="70" y="120" text-anchor="middle" font-family="monospace" font-size="12.5" fill="#1a2b4c">Browser</text>
+
+        <rect x="190" y="90" width="140" height="50" rx="8" fill="#e9f7ee" stroke="#15803d" stroke-width="1.6"/>
+        <text x="260" y="113" text-anchor="middle" font-family="monospace" font-size="12" fill="#0c4a2f">urls.py</text>
+        <text x="260" y="130" text-anchor="middle" font-family="monospace" font-size="10.5" fill="#0c4a2f">(URL dispatcher)</text>
+
+        <rect x="390" y="90" width="140" height="50" rx="8" fill="#fff8e6" stroke="#d4a017" stroke-width="1.6"/>
+        <text x="460" y="113" text-anchor="middle" font-family="monospace" font-size="12" fill="#7a5300">views.py</text>
+        <text x="460" y="130" text-anchor="middle" font-family="monospace" font-size="10.5" fill="#7a5300">("Controller")</text>
+
+        <rect x="590" y="20" width="130" height="50" rx="8" fill="#f1f8f0" stroke="#3ca35c" stroke-width="1.6"/>
+        <text x="655" y="43" text-anchor="middle" font-family="monospace" font-size="12" fill="#1f4d2e">models.py</text>
+        <text x="655" y="60" text-anchor="middle" font-family="monospace" font-size="10.5" fill="#1f4d2e">(ORM ↔ DB)</text>
+
+        <rect x="590" y="160" width="130" height="50" rx="8" fill="#fdeef1" stroke="#c2185b" stroke-width="1.6"/>
+        <text x="655" y="183" text-anchor="middle" font-family="monospace" font-size="12" fill="#8a1245">template.html</text>
+        <text x="655" y="200" text-anchor="middle" font-family="monospace" font-size="10.5" fill="#8a1245">("View" in MVC)</text>
+
+        <rect x="790" y="90" width="140" height="50" rx="8" fill="#eef4ff" stroke="#2563eb" stroke-width="1.6"/>
+        <text x="860" y="113" text-anchor="middle" font-family="monospace" font-size="12" fill="#1a2b4c">HTTP Response</text>
+        <text x="860" y="130" text-anchor="middle" font-family="monospace" font-size="10.5" fill="#1a2b4c">(rendered HTML)</text>
+
+        <line x1="130" y1="115" x2="188" y2="115" stroke="#15803d" stroke-width="1.8" marker-end="url(#a1)"/>
+        <line x1="330" y1="115" x2="388" y2="115" stroke="#15803d" stroke-width="1.8" marker-end="url(#a1)"/>
+        <line x1="460" y1="88" x2="620" y2="72" stroke="#15803d" stroke-width="1.8" marker-end="url(#a1)"/>
+        <line x1="460" y1="142" x2="620" y2="158" stroke="#15803d" stroke-width="1.8" marker-end="url(#a1)"/>
+        <line x1="720" y1="180" x2="788" y2="128" stroke="#15803d" stroke-width="1.8" marker-end="url(#a1)"/>
+        <text x="160" y="105" font-size="10" fill="#475569">request</text>
+        <text x="358" y="105" font-size="10" fill="#475569">matched view</text>
+      </svg>
+      <div class="caption">Fig. 1 — Browser sends a request → <code>urls.py</code> matches it to a view function/class → the view queries <code>models.py</code> and renders <code>template.html</code> with context → HTML flows back to the browser.</div>
+    </div>
+
+    <div class="callout"><b>Key point:</b> in Django, "the framework is the Controller." You never write a Controller class yourself — Django's URL resolver + your View function together perform that job.</div>
+
+    <h3>Underlying theory: WSGI/ASGI and the request–response contract</h3>
+    <p>A Django project is, underneath everything, a <b>WSGI application</b> (or <b>ASGI application</b> for async support) — a Python callable that a web server (Gunicorn, uWSGI, Daphne, Uvicorn…) invokes for every incoming HTTP request. <code>wsgi.py</code> and <code>asgi.py</code> expose this callable so external servers know how to talk to Django. Every view, no matter how it's written, must obey one contract: it receives an <code>HttpRequest</code> object and must return an <code>HttpResponse</code> object (or a subclass such as <code>JsonResponse</code>, <code>HttpResponseRedirect</code>, or raise an exception like <code>Http404</code>). Django's core simply threads this request object through middleware → URL resolver → view → middleware again, and ships the resulting response back to the server.</p>
+
+    <h3>Design philosophy behind Django</h3>
+    <p>Django's own documentation states a handful of guiding principles that explain <i>why</i> the framework looks the way it does:</p>
+    <ul>
+      <li><b>Loose coupling:</b> the layers of the stack (models, views, templates, URL config) don't need to know about each other's internals — you can change your templates without touching your models.</li>
+      <li><b>Less code:</b> Django tries to let you express behaviour concisely — e.g. one line of URL config, one model class, instead of hand‑written SQL and boilerplate HTTP parsing.</li>
+      <li><b>Don't Repeat Yourself (DRY):</b> the model is the single, definitive source of truth for your data — the admin site, forms, and validation all derive from it instead of re‑declaring fields elsewhere.</li>
+      <li><b>Explicit is better than implicit:</b> URLs, imports, and configuration are written out rather than auto‑discovered by "magic" naming conventions (contrast with some other frameworks).</li>
+    </ul>
+
+    <h3>Key features of Django <span style="font-weight:normal;color:#64748b;font-size:12px;">(frequent exam question)</span></h3>
+    <ol>
+      <li><b>Rapid development:</b> a complete admin interface, ORM, and forms system are generated largely from the model, so common CRUD apps can be built very quickly.</li>
+      <li><b>"Batteries included":</b> authentication, sessions, an admin site, form handling, and internationalization all ship with the core framework — no third‑party packages needed to get started.</li>
+      <li><b>Built‑in security:</b> Django protects against SQL injection (parameterised ORM queries), Cross‑Site Scripting (automatic template escaping), Cross‑Site Request Forgery (CSRF middleware/token), and clickjacking (<code>X-Frame-Options</code> middleware) by default.</li>
+      <li><b>Object‑Relational Mapper (ORM):</b> lets developers work with the database using Python classes and methods instead of raw SQL, while remaining portable across database engines.</li>
+      <li><b>Scalability:</b> a "shared‑nothing" architecture lets any layer (database, cache, application servers) be scaled independently by adding hardware.</li>
+      <li><b>Versatility:</b> used for content‑management systems, scientific computing platforms, social networks, and REST APIs (via Django REST Framework) alike.</li>
+      <li><b>Automatic admin interface:</b> <code>django.contrib.admin</code> introspects registered models and generates a ready‑to‑use CRUD interface for site administrators.</li>
+      <li><b>Template engine:</b> the Django Template Language separates presentation from business logic while supporting inheritance, filters, and tags.</li>
+      <li><b>URL routing:</b> a clean, centralised URLconf maps URL patterns to views rather than mapping URLs to files on disk.</li>
+      <li><b>Open source and well‑documented:</b> Django is released under the BSD licence and maintained by the Django Software Foundation with extensive official documentation.</li>
+    </ol>
+
+    <h3>Advantages and disadvantages</h3>
+    <table>
+      <tr><th>Advantages</th><th>Disadvantages</th></tr>
+      <tr><td>Fast development due to built‑in components and the ORM</td><td>Monolithic — pulls in more than a minimal "micro‑framework" like Flask for small projects</td></tr>
+      <tr><td>Strong, consistent security defaults</td><td>The ORM can be less flexible than raw SQL for very complex, performance‑critical queries</td></tr>
+      <tr><td>Large, mature ecosystem and community documentation</td><td>Steeper learning curve for absolute beginners than micro‑frameworks</td></tr>
+      <tr><td>Excellent for database‑driven, content‑heavy sites (blogs, CMS, e‑commerce)</td><td>Its "opinionated," convention‑driven structure can feel restrictive for unconventional architectures</td></tr>
+      <tr><td>Free, open source, backed by an active foundation</td><td>Not primarily designed for real‑time features (WebSockets need Django Channels, a separate add‑on)</td></tr>
+    </table>
+  </section>
+
+  <!-- ============ TOPIC 2 ============ -->
+  <h2 class="qhead">2. Virtual Environments and Project Setup</h2>
+  <section class="q">
+    <p>A <b>virtual environment</b> is an isolated Python installation with its own <code>site-packages</code>, so that the Django version (and every other dependency) required by one project never conflicts with another project on the same machine.</p>
+
+    <div class="diagram-box">
+      <svg viewBox="0 0 760 220" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Diagram: without virtual environments, two projects installed on system Python can clash on Django version; separate virtual environments give each project its own isolated packages.">
+        <rect x="20" y="20" width="220" height="180" rx="10" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="4 3"/>
+        <text x="130" y="42" text-anchor="middle" font-size="12" fill="#334155" font-weight="bold">System Python</text>
+        <rect x="45" y="60" width="170" height="30" rx="5" fill="#eef4ff" stroke="#2563eb"/>
+        <text x="130" y="80" text-anchor="middle" font-family="monospace" font-size="11" fill="#1a2b4c">Django 4.2 (Project A)</text>
+        <rect x="45" y="100" width="170" height="30" rx="5" fill="#fdeef1" stroke="#c2185b"/>
+        <text x="130" y="120" text-anchor="middle" font-family="monospace" font-size="11" fill="#8a1245">Django 5.2 (Project B)</text>
+        <text x="130" y="160" text-anchor="middle" font-size="10.5" fill="#dc2626">⚠ version clash if installed globally</text>
+
+        <rect x="290" y="20" width="440" height="180" rx="10" fill="#e9f7ee" stroke="#15803d" stroke-width="1.5"/>
+        <text x="510" y="42" text-anchor="middle" font-size="12" fill="#0c4a2f" font-weight="bold">Separate Virtual Environments</text>
+        <rect x="315" y="65" width="180" height="110" rx="8" fill="#fff" stroke="#15803d" stroke-width="1.3"/>
+        <text x="405" y="85" text-anchor="middle" font-size="11" fill="#0c4a2f" font-weight="bold">env_projectA/</text>
+        <text x="405" y="110" text-anchor="middle" font-family="monospace" font-size="10.5" fill="#334155">Django 4.2</text>
+        <text x="405" y="130" text-anchor="middle" font-family="monospace" font-size="10.5" fill="#334155">its own packages</text>
+
+        <rect x="530" y="65" width="180" height="110" rx="8" fill="#fff" stroke="#15803d" stroke-width="1.3"/>
+        <text x="620" y="85" text-anchor="middle" font-size="11" fill="#0c4a2f" font-weight="bold">env_projectB/</text>
+        <text x="620" y="110" text-anchor="middle" font-family="monospace" font-size="10.5" fill="#334155">Django 5.2</text>
+        <text x="620" y="130" text-anchor="middle" font-family="monospace" font-size="10.5" fill="#334155">its own packages</text>
+      </svg>
+      <div class="caption">Fig. 2 — Each project gets its own sandboxed environment, so dependency versions never collide.</div>
+    </div>
+
+    <h3>Setup commands</h3>
+    <span class="filelabel">terminal</span>
+<pre><code class="language-bash"># 1. Create a virtual environment
+python -m venv env
+
+# 2. Activate it
+# Windows (PowerShell):
+env\Scripts\activate
+# macOS / Linux:
+source env/bin/activate
+
+# 3. Install Django inside the venv
+pip install django
+
+# 4. Verify installation
+django-admin --version
+
+# 5. Create a new project
+django-admin startproject myproject
+cd myproject
+
+# 6. Run the development server
+python manage.py runserver</code></pre>
+
+    <h3>Freezing dependencies</h3>
+<pre><code class="language-bash"># Save installed packages for teammates / deployment
+pip freeze > requirements.txt
+
+# Recreate the same environment elsewhere
+pip install -r requirements.txt</code></pre>
+
+    <div class="pitfall"><b>Common pitfall:</b> running <code>pip install django</code> without activating the venv first installs it globally, defeating the purpose of isolation. Always confirm the venv is active — the terminal prompt shows the env name in parentheses, e.g. <code>(env) C:\projects\myproject&gt;</code>.</div>
+
+    <h3>How isolation actually works</h3>
+    <p>Every Python interpreter resolves <code>import</code> statements by searching directories listed in <code>sys.path</code>. When you run <code>python -m venv env</code>, Python creates a small, self‑contained directory tree (its own <code>Scripts/</code>/<code>bin/</code>, <code>Lib/site-packages</code>, and a <code>pyvenv.cfg</code> marker file). <b>Activating</b> the environment simply prepends that venv's <code>Scripts/</code>/<code>bin/</code> folder to your shell's <code>PATH</code>, so typing <code>python</code> or <code>pip</code> resolves to the venv's copies rather than the system‑wide ones — and packages installed there land in the venv's private <code>site-packages</code>, invisible to any other project. This is why two projects on the same computer can depend on different, even incompatible, versions of Django without conflict.</p>
+    <p><code>pip</code> itself is just a client for the <b>Python Package Index (PyPI)</b> — a public repository of published packages. <code>requirements.txt</code> is a plain‑text, pinned snapshot of exactly what <code>pip</code> resolved and installed, which is what makes a teammate's or a server's environment reproducible.</p>
+  </section>
+
+  <!-- ============ TOPIC 3 ============ -->
+  <h2 class="qhead">3. App Structure and Settings</h2>
+  <section class="q">
+    <p>A Django <b>project</b> is the whole website/configuration; a Django <b>app</b> is a self‑contained module inside it that does one job (e.g. "blog", "accounts"). One project can, and usually does, contain several apps.<sup>[2]</sup></p>
+
+    <span class="filelabel">terminal</span>
+<pre><code class="language-bash">django-admin startproject myproject
+cd myproject
+python manage.py startapp blog</code></pre>
+
+    <div class="diagram-box">
+      <svg viewBox="0 0 760 380" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Diagram: myproject folder tree containing manage.py and the myproject config package (settings.py, urls.py, wsgi.py, asgi.py) alongside the blog app folder (models.py, views.py, admin.py, migrations).">
+        <line x1="120" y1="38" x2="120" y2="72" stroke="#94a3b8" stroke-width="1.5"/>
+        <line x1="120" y1="108" x2="120" y2="142" stroke="#94a3b8" stroke-width="1.5"/>
+        <line x1="120" y1="108" x2="420" y2="142" stroke="#94a3b8" stroke-width="1.5"/>
+        <line x1="120" y1="178" x2="120" y2="212" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="3 2"/>
+        <line x1="420" y1="178" x2="420" y2="212" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="3 2"/>
+
+        <rect x="55" y="4" width="130" height="34" rx="6" fill="#dbe8ff" stroke="#2563eb" stroke-width="1.7"/>
+        <text x="120" y="26" text-anchor="middle" font-family="monospace" font-size="12.5" fill="#1a2b4c">myproject/</text>
+
+        <rect x="55" y="74" width="130" height="34" rx="6" fill="#eef4ff" stroke="#2563eb" stroke-width="1.5"/>
+        <text x="120" y="96" text-anchor="middle" font-family="monospace" font-size="12" fill="#1a2b4c">manage.py</text>
+
+        <rect x="55" y="144" width="130" height="34" rx="6" fill="#e9f7ee" stroke="#15803d" stroke-width="1.5"/>
+        <text x="120" y="166" text-anchor="middle" font-family="monospace" font-size="12" fill="#0c4a2f">myproject/</text>
+
+        <rect x="355" y="144" width="130" height="34" rx="6" fill="#fff8e6" stroke="#d4a017" stroke-width="1.5"/>
+        <text x="420" y="166" text-anchor="middle" font-family="monospace" font-size="12" fill="#7a5300">blog/</text>
+
+        <rect x="20" y="214" width="200" height="150" rx="6" fill="#f1f8f0" stroke="#3ca35c" stroke-width="1.3"/>
+        <text x="120" y="232" text-anchor="middle" font-family="monospace" font-size="11" fill="#1f4d2e">settings.py — global config</text>
+        <text x="120" y="252" text-anchor="middle" font-family="monospace" font-size="11" fill="#1f4d2e">urls.py — root URLconf</text>
+        <text x="120" y="272" text-anchor="middle" font-family="monospace" font-size="11" fill="#1f4d2e">wsgi.py / asgi.py</text>
+        <text x="120" y="292" text-anchor="middle" font-family="monospace" font-size="11" fill="#1f4d2e">__init__.py</text>
+
+        <rect x="320" y="214" width="200" height="150" rx="6" fill="#fdeef1" stroke="#c2185b" stroke-width="1.3"/>
+        <text x="420" y="232" text-anchor="middle" font-family="monospace" font-size="11" fill="#8a1245">models.py — data</text>
+        <text x="420" y="252" text-anchor="middle" font-family="monospace" font-size="11" fill="#8a1245">views.py — logic</text>
+        <text x="420" y="272" text-anchor="middle" font-family="monospace" font-size="11" fill="#8a1245">admin.py, apps.py</text>
+        <text x="420" y="292" text-anchor="middle" font-family="monospace" font-size="11" fill="#8a1245">migrations/</text>
+        <text x="420" y="312" text-anchor="middle" font-family="monospace" font-size="11" fill="#8a1245">tests.py</text>
+      </svg>
+      <div class="caption">Fig. 3 — <code>myproject/</code> (outer) holds <code>manage.py</code> and the config package; each app (e.g. <code>blog/</code>) is a sibling folder with its own models, views, and migrations.</div>
+    </div>
+
+    <div class="callout"><b>Note:</b> seeing <code>myproject/</code> appear <i>twice</i> is not a typo — <code>django-admin startproject myproject</code> deliberately creates an outer folder and, inside it, a same‑named inner package holding <code>settings.py</code>/<code>urls.py</code>. The outer folder is just a container (you can rename it freely); the inner one is the actual Python configuration package Django imports, so it's best left matching <code>ROOT_URLCONF</code>/<code>WSGI_APPLICATION</code> unless you deliberately update those settings too.</div>
+
+    <h3>Registering the app</h3>
+    <p>Every app must be added to <code>INSTALLED_APPS</code> before Django will recognise its models, templates, or template tags:</p>
+    <span class="filelabel">myproject/settings.py</span>
+<pre><code class="language-python">INSTALLED_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'blog',                # ← our new app
+]</code></pre>
+
+    <h3>Key settings.py variables</h3>
+    <table>
+      <tr><th>Setting</th><th>Purpose</th></tr>
+      <tr><td><code>INSTALLED_APPS</code></td><td>List of active apps (built‑in + yours)</td></tr>
+      <tr><td><code>DATABASES</code></td><td>DB engine/credentials (SQLite by default)</td></tr>
+      <tr><td><code>TEMPLATES</code></td><td>Template engine config — search paths, context processors</td></tr>
+      <tr><td><code>MIDDLEWARE</code></td><td>Ordered list of request/response hooks (auth, sessions, CSRF, etc.)</td></tr>
+      <tr><td><code>ROOT_URLCONF</code></td><td>Dotted path to the project's main <code>urls.py</code></td></tr>
+      <tr><td><code>ALLOWED_HOSTS</code></td><td>Hostnames allowed to serve the site (security check)</td></tr>
+      <tr><td><code>STATIC_URL</code></td><td>URL prefix for CSS/JS/image assets</td></tr>
+      <tr><td><code>DEBUG</code></td><td>Shows detailed error pages when <code>True</code> — must be <code>False</code> in production</td></tr>
+    </table>
+
+    <h3>Why Django separates "project" from "app"</h3>
+    <p>This split exists to encourage <b>reusability</b>: a well‑written app (say, a blog or a comments system) should ideally be droppable into any Django project with minimal changes, because it doesn't hard‑code anything about the site around it. Each app declares its identity and configuration through an <code>AppConfig</code> subclass in <code>apps.py</code> (auto‑generated by <code>startapp</code>), which Django uses to discover the app's models, signals, and default settings such as <code>default_auto_field</code>.</p>
+
+    <h3>settings.py as plain Python</h3>
+    <p><code>settings.py</code> is not a special config format — it is an ordinary Python module, evaluated once when Django starts. This means settings can be computed (e.g. <code>BASE_DIR = Path(__file__).resolve().parent.parent</code> using <code>pathlib</code>) and can read from environment variables for values that must differ between environments:</p>
+<pre><code class="language-python">import os
+from pathlib import Path
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
+DEBUG = os.environ.get('DJANGO_DEBUG', 'False') == 'True'</code></pre>
+    <p>This "12‑factor" pattern — reading secrets and environment‑specific flags from the environment rather than hard‑coding them — is why <code>DEBUG=True</code> and a checked‑in <code>SECRET_KEY</code> are safe for local development but a serious security risk in production: a leaked <code>SECRET_KEY</code> lets an attacker forge session cookies, and <code>DEBUG=True</code> exposes stack traces, file paths, and settings values to any visitor who triggers an error.</p>
+
+    <h3>Middleware — the request/response pipeline</h3>
+    <p><b>Middleware</b> is a chain of Python classes, listed in order in the <code>MIDDLEWARE</code> setting, that hook into every request/response. Each piece of middleware can inspect or modify the request on the way <i>in</i> (before it reaches the view) and the response on the way <i>out</i> (after the view returns) — like layers of an onion, with the view at the centre.</p>
+    <div class="diagram-box">
+      <svg viewBox="0 0 820 150" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Diagram: a request flows through SecurityMiddleware, SessionMiddleware, CsrfViewMiddleware, and AuthenticationMiddleware in order before reaching the view, then the response flows back out through the same chain in reverse.">
+        <defs><marker id="a1b" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#15803d"/></marker></defs>
+        <rect x="10" y="45" width="140" height="55" rx="8" fill="#eef4ff" stroke="#2563eb" stroke-width="1.6"/>
+        <text x="80" y="77" text-anchor="middle" font-family="monospace" font-size="11" fill="#1a2b4c">SecurityMiddleware</text>
+        <rect x="185" y="45" width="140" height="55" rx="8" fill="#e9f7ee" stroke="#15803d" stroke-width="1.6"/>
+        <text x="255" y="77" text-anchor="middle" font-family="monospace" font-size="11" fill="#0c4a2f">SessionMiddleware</text>
+        <rect x="360" y="45" width="140" height="55" rx="8" fill="#fff8e6" stroke="#d4a017" stroke-width="1.6"/>
+        <text x="430" y="77" text-anchor="middle" font-family="monospace" font-size="11" fill="#7a5300">CsrfViewMiddleware</text>
+        <rect x="535" y="45" width="130" height="55" rx="8" fill="#fdeef1" stroke="#c2185b" stroke-width="1.6"/>
+        <text x="600" y="77" text-anchor="middle" font-family="monospace" font-size="11" fill="#8a1245">AuthenticationMiddleware</text>
+        <rect x="695" y="45" width="110" height="55" rx="8" fill="#f1f8f0" stroke="#3ca35c" stroke-width="1.6"/>
+        <text x="750" y="70" text-anchor="middle" font-family="monospace" font-size="11" fill="#1f4d2e">Your</text>
+        <text x="750" y="86" text-anchor="middle" font-family="monospace" font-size="11" fill="#1f4d2e">View</text>
+        <line x1="150" y1="72" x2="183" y2="72" stroke="#15803d" stroke-width="1.8" marker-end="url(#a1b)"/>
+        <line x1="325" y1="72" x2="358" y2="72" stroke="#15803d" stroke-width="1.8" marker-end="url(#a1b)"/>
+        <line x1="500" y1="72" x2="533" y2="72" stroke="#15803d" stroke-width="1.8" marker-end="url(#a1b)"/>
+        <line x1="665" y1="72" x2="693" y2="72" stroke="#15803d" stroke-width="1.8" marker-end="url(#a1b)"/>
+        <text x="410" y="30" text-anchor="middle" font-size="10.5" fill="#475569">request flows left → right, then the response flows right → left back out through the same chain</text>
+      </svg>
+      <div class="caption">Fig. 3b — Each middleware can short‑circuit the chain (e.g. return a redirect early) or let the request continue inward; on the way back out, each layer gets a chance to modify the response too.</div>
+    </div>
+    <table>
+      <tr><th>Common built-in middleware</th><th>Job</th></tr>
+      <tr><td><code>SecurityMiddleware</code></td><td>Enforces HTTPS, HSTS, and other security headers</td></tr>
+      <tr><td><code>SessionMiddleware</code></td><td>Attaches <code>request.session</code>, backed by the session store</td></tr>
+      <tr><td><code>CsrfViewMiddleware</code></td><td>Validates the CSRF token on unsafe requests</td></tr>
+      <tr><td><code>AuthenticationMiddleware</code></td><td>Attaches <code>request.user</code> based on the session</td></tr>
+      <tr><td><code>CommonMiddleware</code></td><td>Handles things like URL normalisation and <code>Content-Length</code></td></tr>
+    </table>
+    <p>A custom middleware is just a callable class with a fixed shape:</p>
+<pre><code class="language-python">class SimpleTimingMiddleware:
+    def __init__(self, get_response):
+        self.get_response = get_response   # next layer in the chain
+
+    def __call__(self, request):
+        # code here runs BEFORE the view
+        response = self.get_response(request)
+        # code here runs AFTER the view
+        return response</code></pre>
+  </section>
+
+  <!-- ============ TOPIC 4 ============ -->
+  <h2 class="qhead">4. URL Routing and Views</h2>
+  <section class="q">
+    <p>A <b>URLconf</b> maps URL patterns to views. Django tries each pattern in <code>urlpatterns</code> from top to bottom and calls the first view whose pattern matches the requested path.<sup>[3]</sup></p>
+
+    <div class="diagram-box">
+      <svg viewBox="0 0 820 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Diagram: a GET request for /blog/5/ is tested against each urls.py pattern top to bottom until it matches path blog int id, which calls post_detail with id=5.">
+        <rect x="10" y="70" width="150" height="50" rx="8" fill="#eef4ff" stroke="#2563eb" stroke-width="1.6"/>
+        <text x="85" y="99" text-anchor="middle" font-family="monospace" font-size="12" fill="#1a2b4c">GET /blog/5/</text>
+
+        <rect x="230" y="20" width="360" height="150" rx="8" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.3" stroke-dasharray="3 2"/>
+        <text x="410" y="38" text-anchor="middle" font-size="11" fill="#475569">urls.py (tried top → bottom)</text>
+        <rect x="250" y="50" width="320" height="26" rx="4" fill="#fff" stroke="#cbd5e1"/>
+        <text x="410" y="68" text-anchor="middle" font-family="monospace" font-size="10.5" fill="#64748b">path('', views.home)</text>
+        <rect x="250" y="82" width="320" height="26" rx="4" fill="#dcfce7" stroke="#15803d" stroke-width="1.6"/>
+        <text x="410" y="100" text-anchor="middle" font-family="monospace" font-size="10.5" fill="#0c4a2f">path('blog/&lt;int:id&gt;/', views.post_detail) ✓ match</text>
+        <rect x="250" y="114" width="320" height="26" rx="4" fill="#fff" stroke="#cbd5e1"/>
+        <text x="410" y="132" text-anchor="middle" font-family="monospace" font-size="10.5" fill="#64748b">path('about/', views.about)</text>
+
+        <rect x="650" y="70" width="150" height="50" rx="8" fill="#fff8e6" stroke="#d4a017" stroke-width="1.6"/>
+        <text x="725" y="92" text-anchor="middle" font-family="monospace" font-size="11.5" fill="#7a5300">post_detail(</text>
+        <text x="725" y="108" text-anchor="middle" font-family="monospace" font-size="11.5" fill="#7a5300">request, id=5)</text>
+
+        <line x1="160" y1="95" x2="228" y2="95" stroke="#15803d" stroke-width="1.8"/>
+        <line x1="590" y1="95" x2="648" y2="95" stroke="#15803d" stroke-width="1.8"/>
+      </svg>
+      <div class="caption">Fig. 4 — The URL dispatcher matches the path against each pattern and calls the matching view, passing any captured URL parameters as arguments.</div>
+    </div>
+
+    <h3>Function‑based view (FBV)</h3>
+    <span class="filelabel">blog/views.py</span>
+<pre><code class="language-python">from django.http import HttpResponse
+from django.shortcuts import render, get_object_or_404
+from .models import Post
+
+def home(request):
+    return HttpResponse("Welcome to the blog!")
+
+def post_detail(request, id):
+    post = get_object_or_404(Post, pk=id)
+    return render(request, 'blog/post_detail.html', {'post': post})</code></pre>
+
+    <span class="filelabel">blog/urls.py</span>
+<pre><code class="language-python">from django.urls import path
+from . import views
+
+app_name = 'blog'
+urlpatterns = [
+    path('', views.home, name='home'),
+    path('blog/&lt;int:id&gt;/', views.post_detail, name='post_detail'),
+]</code></pre>
+
+    <span class="filelabel">myproject/urls.py (root)</span>
+<pre><code class="language-python">from django.contrib import admin
+from django.urls import path, include
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('', include('blog.urls')),   # delegate to the app's URLconf
+]</code></pre>
+
+    <h3>Class‑based view (CBV) equivalent</h3>
+    <p>For simple display logic, Django's generic class‑based views remove boilerplate:</p>
+<pre><code class="language-python">from django.views.generic import DetailView
+from .models import Post
+
+class PostDetailView(DetailView):
+    model = Post
+    template_name = 'blog/post_detail.html'
+    context_object_name = 'post'   # available as {{ post }} in the template</code></pre>
+
+    <div class="callout"><b>Key point:</b> <code>include()</code> lets each app own its own <code>urls.py</code>, keeping the project's root URLconf short and apps self‑contained/reusable.</div>
+
+    <h3>Path converters</h3>
+    <p><code>path()</code> patterns use <b>converters</b> — <code>&lt;converter:name&gt;</code> — to both match and type‑cast the captured URL segment before it's handed to the view:</p>
+    <table>
+      <tr><th>Converter</th><th>Matches</th><th>Python type passed to the view</th></tr>
+      <tr><td><code>str</code> (default)</td><td>Any non‑empty string, excluding <code>/</code></td><td><code>str</code></td></tr>
+      <tr><td><code>int</code></td><td>One or more digits</td><td><code>int</code></td></tr>
+      <tr><td><code>slug</code></td><td>Letters, numbers, hyphens, underscores</td><td><code>str</code></td></tr>
+      <tr><td><code>uuid</code></td><td>A formatted UUID</td><td><code>uuid.UUID</code></td></tr>
+      <tr><td><code>path</code></td><td>Any string, including <code>/</code></td><td><code>str</code></td></tr>
+    </table>
+    <p>For matching logic that converters can't express (e.g. multiple optional segments, custom regex), Django also provides <code>re_path()</code>, which uses raw regular expressions with named groups instead — the older, pre‑Django‑2.0 way of declaring URLs, still valid but more verbose.</p>
+
+    <h3>How the resolver actually works</h3>
+    <p>On every request, Django strips the domain and takes just the path portion of the URL, then walks <code>ROOT_URLCONF</code>'s <code>urlpatterns</code> list <b>in order</b>, testing each entry. An <code>include()</code> entry only needs to match a <i>prefix</i> of the path — Django then hands the <i>remaining</i> portion of the path to that included URLconf to resolve further. This is why app URLs are typically written without a leading slash and why pattern order matters: a broad pattern placed before a specific one can "shadow" it and prevent it from ever being reached.</p>
+
+    <h3>Function-based vs. class-based views</h3>
+    <table>
+      <tr><th>Aspect</th><th>Function-based view (FBV)</th><th>Class-based view (CBV)</th></tr>
+      <tr><td>Readability for simple logic</td><td>Very explicit — easy to trace top to bottom</td><td>More boilerplate for a one‑off, custom view</td></tr>
+      <tr><td>Reuse of common patterns (list, detail, create, update, delete)</td><td>You write the loop/query yourself every time</td><td>Generic views (<code>ListView</code>, <code>DetailView</code>, <code>CreateView</code>…) implement these once, reused via inheritance</td></tr>
+      <tr><td>Extending behaviour</td><td>Copy-paste or compose decorators</td><td>Override a specific method (e.g. <code>get_queryset()</code>) via mixins/subclassing</td></tr>
+      <tr><td>HTTP method dispatch</td><td>Manual <code>if request.method == 'POST':</code></td><td>Automatic — Django calls <code>.get()</code>/<code>.post()</code> methods on the class for you</td></tr>
+    </table>
+  </section>
+
+  <!-- ============ TOPIC 5 ============ -->
+  <h2 class="qhead">5. Rendering Templates with Context Data</h2>
+  <section class="q">
+    <p>A view gathers data into a <b>context dictionary</b> and passes it to <code>render()</code>, which merges it into an HTML template written in the <b>Django Template Language (DTL)</b> — <code>{{ variable }}</code> for output, <code>{% tag %}</code> for logic like loops and conditionals.<sup>[4]</sup></p>
+
+    <div class="diagram-box">
+      <svg viewBox="0 0 820 190" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Diagram: a context dictionary is passed through render() into post_detail.html, where the DTL engine substitutes the template tags to produce the final HTML.">
+        <rect x="10" y="60" width="190" height="70" rx="8" fill="#fff8e6" stroke="#d4a017" stroke-width="1.6"/>
+        <text x="105" y="82" text-anchor="middle" font-family="monospace" font-size="11" fill="#7a5300">context = {</text>
+        <text x="105" y="98" text-anchor="middle" font-family="monospace" font-size="10.5" fill="#7a5300">'post': post,</text>
+        <text x="105" y="114" text-anchor="middle" font-family="monospace" font-size="10.5" fill="#7a5300">'comments': qs }</text>
+
+        <rect x="270" y="60" width="220" height="70" rx="8" fill="#fdeef1" stroke="#c2185b" stroke-width="1.6"/>
+        <text x="380" y="86" text-anchor="middle" font-family="monospace" font-size="11" fill="#8a1245">post_detail.html</text>
+        <text x="380" y="104" text-anchor="middle" font-family="monospace" font-size="10" fill="#8a1245">{{ post.title }}, {% for c in comments %}</text>
+
+        <rect x="560" y="60" width="240" height="70" rx="8" fill="#eef4ff" stroke="#2563eb" stroke-width="1.6"/>
+        <text x="680" y="86" text-anchor="middle" font-family="monospace" font-size="11" fill="#1a2b4c">Final HTML</text>
+        <text x="680" y="104" text-anchor="middle" font-family="monospace" font-size="10" fill="#1a2b4c">placeholders replaced with real values</text>
+
+        <line x1="200" y1="95" x2="268" y2="95" stroke="#15803d" stroke-width="1.8"/>
+        <line x1="490" y1="95" x2="558" y2="95" stroke="#15803d" stroke-width="1.8"/>
+        <text x="215" y="85" font-size="9.5" fill="#475569">render()</text>
+        <text x="500" y="85" font-size="9.5" fill="#475569">DTL engine</text>
+      </svg>
+      <div class="caption">Fig. 5 — <code>render()</code> feeds the context dictionary into the template; the DTL engine substitutes every <code>{{ }}</code>/<code>{% %}</code> tag to produce plain HTML.</div>
+    </div>
+
+    <h3>Passing and using context</h3>
+    <span class="filelabel">blog/views.py</span>
+<pre><code class="language-python">def post_detail(request, id):
+    post = get_object_or_404(Post, pk=id)
+    comments = post.comments.all()
+    context = {'post': post, 'comments': comments}
+    return render(request, 'blog/post_detail.html', context)</code></pre>
+
+    <span class="filelabel">templates/blog/post_detail.html</span>
+<pre><code class="language-html">{% extends "base.html" %}
+
+{% block content %}
+  &lt;h1&gt;{{ post.title }}&lt;/h1&gt;
+  &lt;p&gt;{{ post.body }}&lt;/p&gt;
+
+  &lt;h3&gt;Comments ({{ comments.count }})&lt;/h3&gt;
+  &lt;ul&gt;
+    {% for c in comments %}
+      &lt;li&gt;{{ c.author }}: {{ c.text }}&lt;/li&gt;
+    {% empty %}
+      &lt;li&gt;No comments yet.&lt;/li&gt;
+    {% endfor %}
+  &lt;/ul&gt;
+{% endblock %}</code></pre>
+
+    <h3>Template inheritance</h3>
+    <p>A base layout defines shared structure once; child templates fill in the blocks:</p>
+    <span class="filelabel">templates/base.html</span>
+<pre><code class="language-html">&lt;html&gt;
+&lt;body&gt;
+  &lt;nav&gt;My Site&lt;/nav&gt;
+  {% block content %}{% endblock %}
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+
+    <h3>Enabling template lookup</h3>
+    <span class="filelabel">myproject/settings.py</span>
+<pre><code class="language-python">TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [BASE_DIR / 'templates'],   # project-level templates folder
+        'APP_DIRS': True,                   # also look inside each app's templates/
+        'OPTIONS': {'context_processors': [
+            'django.template.context_processors.request',
+            'django.contrib.auth.context_processors.auth',
+        ]},
+    },
+]</code></pre>
+
+    <div class="pitfall"><b>Common pitfall:</b> forgetting <code>{% extends %}</code> must be the very first line of a child template, and every app's template folder should be namespaced (<code>blog/templates/blog/post_detail.html</code>) to avoid name clashes between apps.</div>
+
+    <h3>Why templates deliberately have limited logic</h3>
+    <p>The Django Template Language is intentionally <b>not</b> full Python — there's no arbitrary function calling or complex expressions inside <code>{{ }}</code>. This is a deliberate design choice to keep business logic in views/models (where it's testable) and presentation logic in templates, and to let designers work on templates without needing to understand — or accidentally break — the application's Python code. Anything more complex than simple attribute lookup, loops, and conditionals should be computed in the view and handed to the template as context.</p>
+
+    <h3>Where variables like <code>user</code> and <code>request</code> come from</h3>
+    <p>You never explicitly pass <code>{'user': request.user}</code> into every <code>context</code> dict, yet <code>{{ user }}</code> works in templates — this is the job of <b>context processors</b>, functions listed under <code>TEMPLATES[0]['OPTIONS']['context_processors']</code> that automatically inject extra variables into <i>every</i> template's context. <code>django.contrib.auth.context_processors.auth</code> adds <code>user</code> and <code>perms</code>; <code>django.template.context_processors.request</code> adds <code>request</code> itself.</p>
+
+    <h3>Template resolution order</h3>
+    <p>When a template name like <code>'blog/post_detail.html'</code> is requested, Django's template loaders search, in order: (1) each directory listed in <code>TEMPLATES[0]['DIRS']</code>, then (2) — if <code>APP_DIRS</code> is <code>True</code> — each installed app's own <code>templates/</code> folder, in the order apps appear in <code>INSTALLED_APPS</code>. The <b>first match wins</b>, which is exactly why namespacing app templates under a subfolder named after the app avoids one app's <code>base.html</code> silently shadowing another's.</p>
+
+    <h3>Automatic escaping (a security feature)</h3>
+    <p>By default, every value rendered through <code>{{ variable }}</code> is <b>HTML‑escaped</b> — characters like <code>&lt;</code>, <code>&gt;</code>, and <code>&amp;</code> are converted to their HTML entities. This is what stops a malicious <code>&lt;script&gt;</code> tag stored in, say, a comment field from executing in another user's browser (a Cross‑Site Scripting / XSS attack). Trusted, pre‑sanitised HTML can be rendered as‑is with the <code>|safe</code> filter or <code>{% autoescape off %}</code>, but only when you are certain the content isn't user‑supplied.</p>
+  </section>
+
+  <h2 class="qhead">Quick Recap — Unit 1 Cheat Sheet</h2>
+  <section class="q">
+    <table>
+      <tr><th>Term</th><th>One-line meaning</th></tr>
+      <tr><td>MVT</td><td>Model–View–Template; Django's variant of MVC where the framework itself is the "Controller"</td></tr>
+      <tr><td>WSGI / ASGI</td><td>The callable interface Django exposes so a web server can talk to it (sync / async)</td></tr>
+      <tr><td>Virtual environment</td><td>Isolated Python + package install, activated by prepending its <code>bin/</code>/<code>Scripts/</code> to <code>PATH</code></td></tr>
+      <tr><td>Project vs. app</td><td>Project = whole site/config; app = one reusable, self-contained feature module</td></tr>
+      <tr><td><code>settings.py</code></td><td>Plain Python module holding <code>INSTALLED_APPS</code>, <code>DATABASES</code>, <code>TEMPLATES</code>, <code>MIDDLEWARE</code>, etc.</td></tr>
+      <tr><td>URLconf</td><td><code>urlpatterns</code> list mapping URL patterns → views, tried top to bottom</td></tr>
+      <tr><td>Path converter</td><td><code>&lt;int:id&gt;</code>-style syntax that both matches and type-casts a URL segment</td></tr>
+      <tr><td>Middleware</td><td>Ordered classes that process every request going in and every response coming out</td></tr>
+      <tr><td>Context dictionary</td><td>Data a view hands to <code>render()</code> so the template can reference it as <code>{{ variable }}</code></td></tr>
+      <tr><td>Context processor</td><td>Function that auto-injects a variable (e.g. <code>user</code>, <code>request</code>) into every template's context</td></tr>
+      <tr><td>Autoescaping</td><td>Default HTML-escaping of <code>{{ }}</code> output that prevents XSS</td></tr>
+    </table>
+    <p><b>Commands to remember:</b> <code>python -m venv env</code> → <code>pip install django</code> → <code>django-admin startproject myproject</code> → <code>python manage.py startapp blog</code> → <code>python manage.py runserver</code>.</p>
+  </section>
+
+  <div class="sources">
+    <b>Sources referenced</b>
+    <ol>
+      <li>[1] <a href="https://docs.djangoproject.com/en/5.2/faq/general/#django-appears-to-be-a-mvc-framework-but-you-call-the-controller-the-view-and-the-view-the-template-how-come-you-don-t-use-the-standard-names" target="_blank">Django docs — FAQ: MVC vs MVT naming</a></li>
+      <li>[2] <a href="https://docs.djangoproject.com/en/5.2/intro/tutorial01/" target="_blank">Django docs — Writing your first app, part 1 (projects vs apps)</a></li>
+      <li>[3] <a href="https://docs.djangoproject.com/en/5.2/topics/http/urls/" target="_blank">Django docs — URL dispatcher</a></li>
+      <li>[4] <a href="https://docs.djangoproject.com/en/5.2/topics/templates/" target="_blank">Django docs — Templates</a></li>
+    </ol>
+  </div>
+
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
+</body>
+</html>

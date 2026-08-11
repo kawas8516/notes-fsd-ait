@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Generation of DOM Tree Using ReactJS — Assignment Solution</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/vs2015.min.css">
+<style>
+  :root{
+    --ink:#1a2b4c; --sub:#475569; --line:#e2e8f0; --accent:#2563eb;
+    --bg-card:#ffffff; --bg-page:#f4f6f9; --code-bg:#1e293b;
+    --node-fill:#eef4ff; --node-stroke:#2563eb; --edge:#94a3b8;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--bg-page); color:#1e293b;
+    font-family:"Segoe UI", Roboto, Georgia, "Times New Roman", serif;
+    line-height:1.65;
+  }
+  .page{max-width:880px; margin:0 auto; padding:28px 26px 60px;}
+  .topbar{
+    background:linear-gradient(135deg,#1a2b4c,#2563eb);
+    color:#fff; padding:22px 28px; border-radius:12px; margin-bottom:26px;
+  }
+  .topbar h1{margin:0 0 6px; font-size:24px;}
+  .topbar .meta{font-size:13.5px; opacity:.9;}
+  h2.qhead{
+    font-size:19px; color:var(--ink); margin:0; padding:14px 18px;
+    background:#eaf0ff; border-left:5px solid var(--accent); border-radius:6px 6px 0 0;
+    display:flex; justify-content:space-between; align-items:center;
+  }
+  .marks-pill{
+    background:var(--accent); color:#fff; font-size:12px; font-weight:600;
+    padding:3px 11px; border-radius:20px; white-space:nowrap;
+  }
+  section.q{
+    background:var(--bg-card); border:1px solid var(--line); border-top:none;
+    border-radius:0 0 10px 10px; padding:20px 24px 24px; margin-bottom:30px;
+    box-shadow:0 1px 3px rgba(0,0,0,.04);
+  }
+  h3{font-size:15.5px; color:var(--ink); margin:20px 0 8px;}
+  p{margin:8px 0; font-size:15px; color:#2b3648;}
+  ul,ol{margin:8px 0 8px 22px; padding:0; font-size:15px; color:#2b3648;}
+  li{margin-bottom:4px;}
+  table{border-collapse:collapse; width:100%; margin:12px 0 16px; font-size:14px;}
+  th,td{border:1px solid var(--line); padding:8px 10px; text-align:left; vertical-align:top;}
+  th{background:#f1f5f9; color:var(--ink);}
+  .callout{
+    background:#fff8e6; border:1px solid #f3d98b; border-left:4px solid #d4a017;
+    border-radius:6px; padding:10px 14px; font-size:14px; margin:14px 0;
+  }
+  .callout b{color:#8a5a00;}
+  .diagram-box{
+    background:#f8fafc; border:1px solid var(--line); border-radius:8px;
+    padding:14px; text-align:center; margin:14px 0;
+  }
+  .diagram-box svg{max-width:100%; height:auto;}
+  .caption{font-size:12.5px; color:#64748b; margin-top:6px; font-style:italic;}
+  pre{
+    background:var(--code-bg); border-radius:8px; padding:14px 16px;
+    overflow-x:auto; font-size:13px; margin:12px 0;
+  }
+  code{font-family:"Fira Code","Consolas",monospace;}
+  .filelabel{
+    display:inline-block; background:#0f172a; color:#93c5fd; font-size:11.5px;
+    padding:2px 10px; border-radius:4px 4px 0 0; font-family:monospace; margin-bottom:-4px;
+  }
+  .sources{
+    background:#f8fafc; border:1px solid var(--line); border-radius:10px;
+    padding:16px 22px; font-size:13.5px; color:#334155;
+  }
+  .sources a{color:var(--accent);}
+  .legend{font-size:12px; color:#64748b; margin-top:8px;}
+  .legend span{display:inline-block; width:11px; height:11px; border-radius:2px; margin-right:5px; vertical-align:middle;}
+  @media print{ body{background:#fff;} .q{box-shadow:none;} }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="topbar">
+    <h1>Generation of DOM Tree Using ReactJS</h1>
+    <div class="meta">Full Stack Development &nbsp;•&nbsp; Topic: Generation of DOM Tree from HTML Code &nbsp;•&nbsp; Total Marks: 30</div>
+  </div>
+
+  <!-- ================= Q1 ================= -->
+  <h2 class="qhead">Q1. What is the DOM? <span class="marks-pill">5 Marks</span></h2>
+  <section class="q">
+    <p><b>Definition.</b> The <b>Document Object Model (DOM)</b> is a programming interface (API) for HTML and XML documents. It represents a document as a logical, language‑independent <b>tree of objects/nodes</b> in memory, so that programs such as JavaScript can read, add, remove, or change the document's structure, content, and style while the page is running &mdash; without reloading it.<sup>[1]</sup></p>
+
+    <h3>How a browser turns HTML into a DOM tree</h3>
+    <ol>
+      <li><b>Tokenizing:</b> the HTML parser scans the raw HTML text and breaks it into tokens (start tags, end tags, text, attributes).</li>
+      <li><b>Tree construction:</b> tokens are converted into <b>node objects</b> and connected according to how tags were nested in the source.</li>
+      <li><b>Root assignment:</b> the finished tree is attached to the special <code>document</code> object, which JavaScript accesses as <code>window.document</code>.</li>
+    </ol>
+
+    <h3>Node types that make up the tree</h3>
+    <table>
+      <tr><th>Node type</th><th>Represents</th><th>Example</th></tr>
+      <tr><td>Document node</td><td>The root of the whole tree</td><td><code>document</code></td></tr>
+      <tr><td>Element node</td><td>An HTML tag</td><td><code>&lt;h1&gt;</code>, <code>&lt;div&gt;</code></td></tr>
+      <tr><td>Text node</td><td>The literal text inside an element</td><td><code>"Hello"</code></td></tr>
+      <tr><td>Attribute node</td><td>A tag's attribute</td><td><code>class="title"</code></td></tr>
+      <tr><td>Comment node</td><td>An HTML comment</td><td><code>&lt;!-- note --&gt;</code></td></tr>
+    </table>
+
+    <h3>Example</h3>
+    <span class="filelabel">index.html</span>
+<pre><code class="language-html">&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+  &lt;body&gt;
+    &lt;h1&gt;Hello&lt;/h1&gt;
+  &lt;/body&gt;
+&lt;/html&gt;</code></pre>
+
+    <div class="diagram-box">
+      <svg viewBox="0 0 260 380" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <marker id="arrow1" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#94a3b8"/></marker>
+        </defs>
+        <line x1="130" y1="38" x2="130" y2="82" stroke="#94a3b8" stroke-width="1.5"/>
+        <line x1="130" y1="118" x2="130" y2="162" stroke="#94a3b8" stroke-width="1.5"/>
+        <line x1="130" y1="198" x2="130" y2="242" stroke="#94a3b8" stroke-width="1.5"/>
+        <line x1="130" y1="278" x2="130" y2="322" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="4 3"/>
+
+        <rect x="65" y="4" width="130" height="34" rx="6" fill="#eef4ff" stroke="#2563eb" stroke-width="1.5"/>
+        <text x="130" y="26" text-anchor="middle" font-family="monospace" font-size="13" fill="#1a2b4c">document</text>
+
+        <rect x="65" y="84" width="130" height="34" rx="6" fill="#eef4ff" stroke="#2563eb" stroke-width="1.5"/>
+        <text x="130" y="106" text-anchor="middle" font-family="monospace" font-size="13" fill="#1a2b4c">html</text>
+
+        <rect x="65" y="164" width="130" height="34" rx="6" fill="#eef4ff" stroke="#2563eb" stroke-width="1.5"/>
+        <text x="130" y="186" text-anchor="middle" font-family="monospace" font-size="13" fill="#1a2b4c">body</text>
+
+        <rect x="65" y="244" width="130" height="34" rx="6" fill="#eef4ff" stroke="#2563eb" stroke-width="1.5"/>
+        <text x="130" y="266" text-anchor="middle" font-family="monospace" font-size="13" fill="#1a2b4c">h1</text>
+
+        <rect x="45" y="324" width="170" height="34" rx="17" fill="#fef3c7" stroke="#d4a017" stroke-width="1.5" stroke-dasharray="3 2"/>
+        <text x="130" y="346" text-anchor="middle" font-family="monospace" font-size="12.5" fill="#7a5300">"Hello" (text node)</text>
+      </svg>
+      <div class="caption">Fig. 1 — Every nested tag becomes a child node; the visible text becomes its own text‑node leaf.</div>
+    </div>
+
+    <div class="callout"><b>Key point:</b> the DOM is not the HTML file — it is the browser's live, in‑memory tree. JavaScript reads/writes this tree (e.g. <code>document.querySelector()</code>, <code>appendChild()</code>), and the browser re‑renders the screen to match it.</div>
+  </section>
+
+  <!-- ================= Q2 ================= -->
+  <h2 class="qhead">Q2. DOM Tree for html, head, body, h1, p, div <span class="marks-pill">5 Marks</span></h2>
+  <section class="q">
+    <p>Consider the following HTML document:</p>
+    <span class="filelabel">index.html</span>
+<pre><code class="language-html">&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;title&gt;Sample Page&lt;/title&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;h1&gt;Welcome&lt;/h1&gt;
+    &lt;p&gt;This is a paragraph.&lt;/p&gt;
+    &lt;div&gt;This is a div.&lt;/div&gt;
+  &lt;/body&gt;
+&lt;/html&gt;</code></pre>
+
+    <div class="diagram-box">
+      <svg viewBox="0 0 900 300" xmlns="http://www.w3.org/2000/svg">
+        <line x1="390" y1="68" x2="170" y2="132" stroke="#94a3b8" stroke-width="1.5"/>
+        <line x1="390" y1="68" x2="620" y2="132" stroke="#94a3b8" stroke-width="1.5"/>
+        <line x1="170" y1="168" x2="170" y2="232" stroke="#94a3b8" stroke-width="1.5"/>
+        <line x1="620" y1="168" x2="450" y2="232" stroke="#94a3b8" stroke-width="1.5"/>
+        <line x1="620" y1="168" x2="620" y2="232" stroke="#94a3b8" stroke-width="1.5"/>
+        <line x1="620" y1="168" x2="790" y2="232" stroke="#94a3b8" stroke-width="1.5"/>
+
+        <rect x="325" y="32" width="130" height="36" rx="6" fill="#dbe8ff" stroke="#2563eb" stroke-width="1.8"/>
+        <text x="390" y="55" text-anchor="middle" font-family="monospace" font-size="14" fill="#1a2b4c">html</text>
+
+        <rect x="105" y="132" width="130" height="36" rx="6" fill="#eef4ff" stroke="#2563eb" stroke-width="1.5"/>
+        <text x="170" y="155" text-anchor="middle" font-family="monospace" font-size="13" fill="#1a2b4c">head</text>
+
+        <rect x="555" y="132" width="130" height="36" rx="6" fill="#eef4ff" stroke="#2563eb" stroke-width="1.5"/>
+        <text x="620" y="155" text-anchor="middle" font-family="monospace" font-size="13" fill="#1a2b4c">body</text>
+
+        <rect x="105" y="232" width="130" height="36" rx="6" fill="#f1f8f0" stroke="#3ca35c" stroke-width="1.5"/>
+        <text x="170" y="255" text-anchor="middle" font-family="monospace" font-size="13" fill="#1f4d2e">title</text>
+
+        <rect x="385" y="232" width="130" height="36" rx="6" fill="#f1f8f0" stroke="#3ca35c" stroke-width="1.5"/>
+        <text x="450" y="255" text-anchor="middle" font-family="monospace" font-size="13" fill="#1f4d2e">h1</text>
+
+        <rect x="555" y="232" width="130" height="36" rx="6" fill="#f1f8f0" stroke="#3ca35c" stroke-width="1.5"/>
+        <text x="620" y="255" text-anchor="middle" font-family="monospace" font-size="13" fill="#1f4d2e">p</text>
+
+        <rect x="725" y="232" width="130" height="36" rx="6" fill="#f1f8f0" stroke="#3ca35c" stroke-width="1.5"/>
+        <text x="790" y="255" text-anchor="middle" font-family="monospace" font-size="13" fill="#1f4d2e">div</text>
+      </svg>
+      <div class="caption">Fig. 2 — <code>html</code> is the root; <code>head</code> and <code>body</code> are siblings; <code>title</code> is head's only child; <code>h1</code>, <code>p</code>, <code>div</code> are siblings under <code>body</code>.</div>
+    </div>
+
+    <h3>Parent‑child relationships</h3>
+    <ul>
+      <li><code>html</code> is the <b>root element</b> — parent of <code>head</code> and <code>body</code>.</li>
+      <li><code>head</code> and <code>body</code> are <b>siblings</b> (same parent, <code>html</code>).</li>
+      <li><code>title</code> is the only <b>child</b> of <code>head</code>.</li>
+      <li><code>h1</code>, <code>p</code>, and <code>div</code> are all <b>children of <code>body</code></b>, and therefore siblings of one another.</li>
+      <li>Each of <code>title</code>, <code>h1</code>, <code>p</code>, and <code>div</code> additionally owns one <b>text node</b> child holding its visible text (omitted above for clarity).</li>
+    </ul>
+  </section>
+
+  <!-- ================= Q3 ================= -->
+  <h2 class="qhead">Q3. How ReactJS Uses JSX <span class="marks-pill">5 Marks</span></h2>
+  <section class="q">
+    <p><b>JSX (JavaScript XML)</b> is a syntax extension that lets developers write HTML‑like markup directly inside JavaScript. Browsers cannot run JSX natively, so a compiler (Babel, part of every React toolchain) transpiles each JSX tag into a call to <code>React.createElement()</code> — or, with the modern automatic JSX runtime, into an internal <code>_jsx()</code> call.<sup>[3]</sup></p>
+
+    <p>Every one of these calls returns a plain JavaScript object called a <b>React element</b> — a lightweight description of "what should appear on screen", not an actual DOM node. React later reads this tree of elements and builds/updates the real DOM to match it.</p>
+
+    <h3>JSX code example</h3>
+    <span class="filelabel">Greeting.jsx</span>
+<pre><code class="language-jsx">function Greeting() {
+  return (
+    &lt;div className="greeting"&gt;
+      &lt;h1&gt;Hello, World!&lt;/h1&gt;
+      &lt;p&gt;Welcome to React.&lt;/p&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>
+
+    <p>Babel transpiles this to (classic runtime, shown for teaching clarity):</p>
+<pre><code class="language-javascript">function Greeting() {
+  return React.createElement(
+    "div",
+    { className: "greeting" },
+    React.createElement("h1", null, "Hello, World!"),
+    React.createElement("p", null, "Welcome to React.")
+  );
+}</code></pre>
+
+    <p>...which produces this <b>React element object</b> at runtime:</p>
+<pre><code class="language-javascript">{
+  type: "div",
+  props: {
+    className: "greeting",
+    children: [
+      { type: "h1", props: { children: "Hello, World!" } },
+      { type: "p",  props: { children: "Welcome to React." } }
+    ]
+  }
+}</code></pre>
+
+    <p>Finally, this element tree is mounted to a real DOM node:</p>
+<pre><code class="language-javascript">import { createRoot } from "react-dom/client";
+createRoot(document.getElementById("root")).render(&lt;Greeting /&gt;);</code></pre>
+
+    <div class="callout"><b>Key point:</b> JSX &rarr; <code>createElement</code> calls &rarr; React element tree &rarr; ReactDOM walks the tree and creates/updates real DOM nodes. JSX is purely syntax sugar for describing UI structure declaratively.</div>
+  </section>
+
+  <!-- ================= Q4 ================= -->
+  <h2 class="qhead">Q4. DOM Tree of Nested JSX Elements <span class="marks-pill">5 Marks</span></h2>
+  <section class="q">
+    <p>Consider a component tree made of a parent <code>App</code> composed of three child components, <code>Header</code>, <code>Main</code>, and <code>Footer</code>:</p>
+    <span class="filelabel">App.jsx</span>
+<pre><code class="language-jsx">function Header() {
+  return (
+    &lt;header&gt;
+      &lt;h1&gt;My Website&lt;/h1&gt;
+    &lt;/header&gt;
+  );
+}
+
+function Main() {
+  return (
+    &lt;main&gt;
+      &lt;p&gt;Welcome to the homepage.&lt;/p&gt;
+      &lt;ul&gt;
+        &lt;li&gt;Home&lt;/li&gt;
+        &lt;li&gt;About&lt;/li&gt;
+      &lt;/ul&gt;
+    &lt;/main&gt;
+  );
+}
+
+function Footer() {
+  return (
+    &lt;footer&gt;
+      &lt;p&gt;&amp;copy; 2026&lt;/p&gt;
+    &lt;/footer&gt;
+  );
+}
+
+function App() {
+  return (
+    &lt;div className="app"&gt;
+      &lt;Header /&gt;
+      &lt;Main /&gt;
+      &lt;Footer /&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>
+
+    <p>React first resolves the <b>component tree</b> (<code>App &rarr; Header, Main, Footer</code>) by calling each function. Custom components (capitalized, e.g. <code>&lt;Header /&gt;</code>) are <b>not</b> real tags — React "unwraps" them and keeps only the <b>host elements</b> (lowercase tags like <code>div</code>, <code>header</code>, <code>p</code>) they eventually return. Only those host elements become actual nodes in the browser's DOM:</p>
+
+    <div class="diagram-box">
+      <svg viewBox="0 0 960 400" xmlns="http://www.w3.org/2000/svg">
+        <line x1="480" y1="68" x2="180" y2="132" stroke="#94a3b8" stroke-width="1.5"/>
+        <line x1="480" y1="68" x2="480" y2="132" stroke="#94a3b8" stroke-width="1.5"/>
+        <line x1="480" y1="68" x2="790" y2="132" stroke="#94a3b8" stroke-width="1.5"/>
+
+        <line x1="180" y1="168" x2="180" y2="222" stroke="#94a3b8" stroke-width="1.5"/>
+        <line x1="480" y1="168" x2="380" y2="222" stroke="#94a3b8" stroke-width="1.5"/>
+        <line x1="480" y1="168" x2="580" y2="222" stroke="#94a3b8" stroke-width="1.5"/>
+        <line x1="790" y1="168" x2="790" y2="222" stroke="#94a3b8" stroke-width="1.5"/>
+
+        <line x1="580" y1="258" x2="510" y2="312" stroke="#94a3b8" stroke-width="1.5"/>
+        <line x1="580" y1="258" x2="650" y2="312" stroke="#94a3b8" stroke-width="1.5"/>
+
+        <rect x="415" y="32" width="130" height="36" rx="6" fill="#dbe8ff" stroke="#2563eb" stroke-width="1.8"/>
+        <text x="480" y="55" text-anchor="middle" font-family="monospace" font-size="13" fill="#1a2b4c">div.app</text>
+
+        <rect x="115" y="132" width="130" height="36" rx="6" fill="#eef4ff" stroke="#2563eb" stroke-width="1.5"/>
+        <text x="180" y="155" text-anchor="middle" font-family="monospace" font-size="13" fill="#1a2b4c">header</text>
+        <rect x="415" y="132" width="130" height="36" rx="6" fill="#eef4ff" stroke="#2563eb" stroke-width="1.5"/>
+        <text x="480" y="155" text-anchor="middle" font-family="monospace" font-size="13" fill="#1a2b4c">main</text>
+        <rect x="725" y="132" width="130" height="36" rx="6" fill="#eef4ff" stroke="#2563eb" stroke-width="1.5"/>
+        <text x="790" y="155" text-anchor="middle" font-family="monospace" font-size="13" fill="#1a2b4c">footer</text>
+
+        <rect x="115" y="222" width="130" height="36" rx="6" fill="#f1f8f0" stroke="#3ca35c" stroke-width="1.5"/>
+        <text x="180" y="245" text-anchor="middle" font-family="monospace" font-size="12.5" fill="#1f4d2e">h1 "My Website"</text>
+        <rect x="315" y="222" width="130" height="36" rx="6" fill="#f1f8f0" stroke="#3ca35c" stroke-width="1.5"/>
+        <text x="380" y="245" text-anchor="middle" font-family="monospace" font-size="12.5" fill="#1f4d2e">p "Welcome…"</text>
+        <rect x="515" y="222" width="130" height="36" rx="6" fill="#eef4ff" stroke="#2563eb" stroke-width="1.5"/>
+        <text x="580" y="245" text-anchor="middle" font-family="monospace" font-size="13" fill="#1a2b4c">ul</text>
+        <rect x="725" y="222" width="130" height="36" rx="6" fill="#f1f8f0" stroke="#3ca35c" stroke-width="1.5"/>
+        <text x="790" y="245" text-anchor="middle" font-family="monospace" font-size="12.5" fill="#1f4d2e">p "© 2026"</text>
+
+        <rect x="445" y="312" width="130" height="36" rx="6" fill="#f1f8f0" stroke="#3ca35c" stroke-width="1.5"/>
+        <text x="510" y="335" text-anchor="middle" font-family="monospace" font-size="12.5" fill="#1f4d2e">li "Home"</text>
+        <rect x="585" y="312" width="130" height="36" rx="6" fill="#f1f8f0" stroke="#3ca35c" stroke-width="1.5"/>
+        <text x="650" y="335" text-anchor="middle" font-family="monospace" font-size="12.5" fill="#1f4d2e">li "About"</text>
+      </svg>
+      <div class="caption">Fig. 3 — Actual rendered DOM tree. Note <code>Header</code>, <code>Main</code>, <code>Footer</code> do not appear as nodes — only the host tags they returned do.</div>
+    </div>
+
+    <h3>Parent‑child relationships</h3>
+    <ul>
+      <li><code>div.app</code> is the root and direct parent of <code>header</code>, <code>main</code>, and <code>footer</code> (siblings).</li>
+      <li><code>h1</code> is the sole child of <code>header</code>.</li>
+      <li><code>p</code> ("Welcome…") and <code>ul</code> are children of <code>main</code>, hence siblings.</li>
+      <li><code>li</code> "Home" and <code>li</code> "About" are children of <code>ul</code>, and grandchildren of <code>main</code>.</li>
+      <li><code>p</code> ("© 2026") is the sole child of <code>footer</code>.</li>
+    </ul>
+  </section>
+
+  <!-- ================= Q5 ================= -->
+  <h2 class="qhead">Q5. DOM vs Virtual DOM <span class="marks-pill">5 Marks</span></h2>
+  <section class="q">
+    <table>
+      <tr><th>Aspect</th><th>Real DOM</th><th>Virtual DOM</th></tr>
+      <tr><td>What it is</td><td>The browser's actual, live tree that is painted on screen</td><td>A lightweight, in‑memory JavaScript object tree that mirrors the UI<sup>[4]</sup></td></tr>
+      <tr><td>Update cost</td><td>Expensive — every mutation can trigger layout recalculation (reflow) and repaint</td><td>Cheap — creating/comparing plain JS objects has no rendering cost</td></tr>
+      <tr><td>Update strategy</td><td>Direct, immediate mutation, one change at a time</td><td>Batched — React first computes a "diff" against the previous tree, then applies only the minimal real changes</td></tr>
+      <tr><td>Managed by</td><td>The browser engine</td><td>React's reconciler (built on the Fiber architecture since React 16)<sup>[5]</sup></td></tr>
+      <tr><td>Performance at scale</td><td>Degrades with many frequent direct edits</td><td>Stays fast — many small state changes are combined into one efficient DOM update</td></tr>
+    </table>
+
+    <h3>Why React uses this approach (reconciliation)</h3>
+    <ol>
+      <li>A state/props change causes React to build a <b>new element tree</b> describing the desired UI.</li>
+      <li>React <b>diffs</b> this new tree against the previous one to find exactly what changed.</li>
+      <li>React computes the <b>minimal set</b> of real DOM operations required.</li>
+      <li>The <b>Fiber</b> engine applies these updates to the real DOM, batching work and even splitting it into interruptible units for smoother performance.</li>
+    </ol>
+
+    <div class="callout"><b>Key point:</b> Writing to the real DOM directly for every small change is slow because the browser must recompute layout and repaint. By diffing lightweight JS objects first and touching the real DOM only where necessary, React lets developers write simple, declarative code ("render UI for this state") while still getting fast updates. Note: current official React docs favour describing this as "the reconciler/Fiber" rather than the term "virtual DOM", but the underlying diff‑then‑patch idea is the same.</div>
+  </section>
+
+  <!-- ================= Q6 ================= -->
+  <h2 class="qhead">Q6. React App — Heading, Paragraph, List, Button <span class="marks-pill">5 Marks</span></h2>
+  <section class="q">
+    <span class="filelabel">App.jsx</span>
+<pre><code class="language-jsx">function App() {
+  return (
+    &lt;div className="app"&gt;
+      &lt;h1&gt;Welcome to My React App&lt;/h1&gt;
+      &lt;p&gt;This is a simple ReactJS application demonstrating a heading,
+         a paragraph, a list, and a button.&lt;/p&gt;
+      &lt;ul&gt;
+        &lt;li&gt;Learn HTML&lt;/li&gt;
+        &lt;li&gt;Learn CSS&lt;/li&gt;
+        &lt;li&gt;Learn JavaScript&lt;/li&gt;
+        &lt;li&gt;Learn ReactJS&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;button onClick={() =&gt; alert("Button clicked!")}&gt;Click Me&lt;/button&gt;
+    &lt;/div&gt;
+  );
+}
+
+export default App;</code></pre>
+
+    <span class="filelabel">main.jsx</span>
+<pre><code class="language-jsx">import { createRoot } from "react-dom/client";
+import App from "./App";
+
+createRoot(document.getElementById("root")).render(&lt;App /&gt;);</code></pre>
+
+    <h3>Generated DOM tree</h3>
+    <div class="diagram-box">
+      <svg viewBox="0 0 960 300" xmlns="http://www.w3.org/2000/svg">
+        <line x1="460" y1="68" x2="90" y2="132" stroke="#94a3b8" stroke-width="1.5"/>
+        <line x1="460" y1="68" x2="270" y2="132" stroke="#94a3b8" stroke-width="1.5"/>
+        <line x1="460" y1="68" x2="490" y2="132" stroke="#94a3b8" stroke-width="1.5"/>
+        <line x1="460" y1="68" x2="820" y2="132" stroke="#94a3b8" stroke-width="1.5"/>
+
+        <line x1="490" y1="168" x2="330" y2="222" stroke="#94a3b8" stroke-width="1.5"/>
+        <line x1="490" y1="168" x2="490" y2="222" stroke="#94a3b8" stroke-width="1.5"/>
+        <line x1="490" y1="168" x2="660" y2="222" stroke="#94a3b8" stroke-width="1.5"/>
+        <line x1="490" y1="168" x2="850" y2="222" stroke="#94a3b8" stroke-width="1.5"/>
+
+        <rect x="395" y="32" width="130" height="36" rx="6" fill="#dbe8ff" stroke="#2563eb" stroke-width="1.8"/>
+        <text x="460" y="55" text-anchor="middle" font-family="monospace" font-size="13" fill="#1a2b4c">div.app</text>
+
+        <rect x="25" y="132" width="130" height="36" rx="6" fill="#f1f8f0" stroke="#3ca35c" stroke-width="1.5"/>
+        <text x="90" y="155" text-anchor="middle" font-family="monospace" font-size="12.5" fill="#1f4d2e">h1</text>
+        <rect x="205" y="132" width="130" height="36" rx="6" fill="#f1f8f0" stroke="#3ca35c" stroke-width="1.5"/>
+        <text x="270" y="155" text-anchor="middle" font-family="monospace" font-size="12.5" fill="#1f4d2e">p</text>
+        <rect x="425" y="132" width="130" height="36" rx="6" fill="#eef4ff" stroke="#2563eb" stroke-width="1.5"/>
+        <text x="490" y="155" text-anchor="middle" font-family="monospace" font-size="13" fill="#1a2b4c">ul</text>
+        <rect x="755" y="132" width="130" height="36" rx="6" fill="#f1f8f0" stroke="#3ca35c" stroke-width="1.5"/>
+        <text x="820" y="155" text-anchor="middle" font-family="monospace" font-size="12.5" fill="#1f4d2e">button</text>
+
+        <rect x="255" y="222" width="150" height="36" rx="6" fill="#fff8e6" stroke="#d4a017" stroke-width="1.5"/>
+        <text x="330" y="245" text-anchor="middle" font-family="monospace" font-size="11.5" fill="#7a5300">li "Learn HTML"</text>
+        <rect x="415" y="222" width="150" height="36" rx="6" fill="#fff8e6" stroke="#d4a017" stroke-width="1.5"/>
+        <text x="490" y="245" text-anchor="middle" font-family="monospace" font-size="11.5" fill="#7a5300">li "Learn CSS"</text>
+        <rect x="570" y="222" width="180" height="36" rx="6" fill="#fff8e6" stroke="#d4a017" stroke-width="1.5"/>
+        <text x="660" y="245" text-anchor="middle" font-family="monospace" font-size="11.5" fill="#7a5300">li "Learn JavaScript"</text>
+        <rect x="760" y="222" width="180" height="36" rx="6" fill="#fff8e6" stroke="#d4a017" stroke-width="1.5"/>
+        <text x="850" y="245" text-anchor="middle" font-family="monospace" font-size="11.5" fill="#7a5300">li "Learn ReactJS"</text>
+      </svg>
+      <div class="caption">Fig. 4 — <code>div.app</code> is parent of <code>h1</code>, <code>p</code>, <code>ul</code>, <code>button</code> (siblings); <code>ul</code> is parent of four <code>li</code> siblings.</div>
+    </div>
+
+    <h3>Expected output (rendered in the browser)</h3>
+    <table>
+      <tr><th>Element</th><th>Renders as</th></tr>
+      <tr><td><code>h1</code></td><td>Bold heading — "Welcome to My React App"</td></tr>
+      <tr><td><code>p</code></td><td>Paragraph text describing the demo app</td></tr>
+      <tr><td><code>ul</code> / <code>li</code>×4</td><td>Bulleted list: Learn HTML, Learn CSS, Learn JavaScript, Learn ReactJS</td></tr>
+      <tr><td><code>button</code></td><td>A clickable "Click Me" button; clicking it triggers <code>alert("Button clicked!")</code></td></tr>
+    </table>
+
+    <h3>Steps to run</h3>
+<pre><code class="language-bash">npm create vite@latest my-app -- --template react
+cd my-app
+npm install
+npm run dev</code></pre>
+  </section>
+
+  <div class="sources">
+    <b>Sources referenced</b>
+    <ol>
+      <li>[1] <a href="https://developer.mozilla.org/en-US/docs/Web/API/Document_Object_Model" target="_blank">MDN — Document Object Model (DOM)</a></li>
+      <li>[2] <a href="https://developer.mozilla.org/en-US/docs/Web/API/Document_Object_Model/Anatomy_of_the_DOM" target="_blank">MDN — Anatomy of the DOM</a></li>
+      <li>[3] <a href="https://react.dev/learn/writing-markup-with-jsx" target="_blank">React docs — Writing Markup with JSX</a></li>
+      <li>[4] <a href="https://legacy.reactjs.org/docs/faq-internals.html" target="_blank">React docs (legacy) — Virtual DOM and Internals</a></li>
+      <li>[5] <a href="https://legacy.reactjs.org/docs/reconciliation.html" target="_blank">React docs (legacy) — Reconciliation</a></li>
+    </ol>
+  </div>
+
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
+</body>
+</html>
