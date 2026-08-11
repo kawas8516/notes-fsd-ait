@@ -19,3 +19,4 @@ desktop.ini
 # Node (only relevant if any tooling/scripts get added later)
 node_modules/
 npm-debug.log*
+.impeccable/
