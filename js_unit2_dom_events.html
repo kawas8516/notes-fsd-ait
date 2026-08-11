@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>JS Unit 2 — DOM Manipulation and Browser Events</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/vs2015.min.css">
+<link rel="stylesheet" href="js-notes.css">
+</head>
+<body>
+<div class="page">
+
+  <div class="topbar">
+    <h1>Unit 2 — DOM Manipulation and Browser Events</h1>
+    <div class="meta">The DOM &nbsp;•&nbsp; Selecting Elements &nbsp;•&nbsp; Nodes &nbsp;•&nbsp; Attributes &amp; Classes &nbsp;•&nbsp; Events &nbsp;•&nbsp; Delegation/Bubbling/Capturing &nbsp;•&nbsp; Virtual DOM &nbsp;•&nbsp; Best Practices</div>
+  </div>
+
+  <div class="nav">
+    <a class="home-btn" href="index.html" title="Back to home" aria-label="Back to home"><svg viewBox="0 0 24 24"><path d="M12 3l9 8h-3v9h-5v-6h-2v6H6v-9H3l9-8z"/></svg></a>
+    <a href="js_unit1_modern_syntax.html">JS Unit 1 · Modern Syntax</a>
+    <a class="active" href="js_unit2_dom_events.html">JS Unit 2 · DOM &amp; Events</a>
+  </div>
+
+  <!-- ============ TOPIC 1 ============ -->
+  <h2 class="qhead">1. Introduction to the Document Object Model</h2>
+  <section class="q">
+    <p>The <b>Document Object Model (DOM)</b> is the browser's live, in‑memory, tree‑shaped representation of an HTML page. It is not the HTML file itself — it's the structured object tree the browser builds after parsing that file, and it's what JavaScript actually reads and mutates to change what's on screen.<sup>[1]</sup></p>
+
+    <div class="diagram-box">
+      <svg viewBox="0 0 700 220" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Diagram: document is the root, with html as its child; html has head and body children; body has h1 and p children.">
+        <line x1="350" y1="38" x2="350" y2="72" stroke="#94a3b8" stroke-width="1.5"/>
+        <line x1="350" y1="108" x2="180" y2="142" stroke="#94a3b8" stroke-width="1.5"/>
+        <line x1="350" y1="108" x2="520" y2="142" stroke="#94a3b8" stroke-width="1.5"/>
+        <line x1="520" y1="178" x2="430" y2="142" stroke="#94a3b8" stroke-width="0" opacity="0"/>
+        <line x1="520" y1="108" x2="430" y2="142" stroke="#94a3b8" stroke-width="0" opacity="0"/>
+        <line x1="520" y1="178" x2="430" y2="212" stroke="#94a3b8" stroke-width="1.5" opacity="0"/>
+
+        <rect x="285" y="4" width="130" height="34" rx="6" fill="#fff9db" stroke="#b8860b" stroke-width="1.8"/>
+        <text x="350" y="26" text-anchor="middle" font-family="monospace" font-size="12.5" fill="#7a5300">document</text>
+
+        <rect x="285" y="74" width="130" height="34" rx="6" fill="#eef4ff" stroke="#2563eb" stroke-width="1.6"/>
+        <text x="350" y="96" text-anchor="middle" font-family="monospace" font-size="12.5" fill="#1a2b4c">html</text>
+
+        <rect x="115" y="144" width="130" height="34" rx="6" fill="#f1f8f0" stroke="#3ca35c" stroke-width="1.5"/>
+        <text x="180" y="166" text-anchor="middle" font-family="monospace" font-size="12" fill="#1f4d2e">head</text>
+
+        <rect x="455" y="144" width="130" height="34" rx="6" fill="#f1f8f0" stroke="#3ca35c" stroke-width="1.5"/>
+        <text x="520" y="166" text-anchor="middle" font-family="monospace" font-size="12" fill="#1f4d2e">body</text>
+
+        <line x1="520" y1="178" x2="430" y2="212" stroke="#94a3b8" stroke-width="1.5"/>
+        <line x1="520" y1="178" x2="610" y2="212" stroke="#94a3b8" stroke-width="1.5"/>
+        <rect x="365" y="212" width="130" height="0" opacity="0"/>
+        <rect x="365" y="212" width="130" height="34" rx="6" fill="#fdeef1" stroke="#c2185b" stroke-width="1.4"/>
+        <text x="430" y="234" text-anchor="middle" font-family="monospace" font-size="11.5" fill="#8a1245">h1</text>
+        <rect x="545" y="212" width="130" height="34" rx="6" fill="#fdeef1" stroke="#c2185b" stroke-width="1.4"/>
+        <text x="610" y="234" text-anchor="middle" font-family="monospace" font-size="11.5" fill="#8a1245">p</text>
+      </svg>
+      <div class="caption">Fig. 1 — Every tag in the HTML source becomes a node in this tree; <code>document</code> is the entry point JavaScript uses to reach any of them.</div>
+    </div>
+
+    <h3><code>window</code> vs. <code>document</code></h3>
+    <p><code>window</code> is the top-level global object in a browser — it represents the browser tab/window itself and holds things like <code>setTimeout</code>, <code>location</code>, and <code>alert</code>. <code>document</code> is a property of <code>window</code> and is specifically the entry point into the page's DOM tree.</p>
+    <div class="callout"><b>Key point:</b> the DOM is a live representation — mutate it (e.g. <code>element.textContent = 'new'</code>) and the browser re-renders the visible page immediately; there's no separate "save" step.</div>
+  </section>
+
+  <!-- ============ TOPIC 2 ============ -->
+  <h2 class="qhead">2. Selecting and Manipulating DOM Elements</h2>
+  <section class="q">
+    <table>
+      <tr><th>Method</th><th>Returns</th><th>Notes</th></tr>
+      <tr><td><code>document.getElementById('id')</code></td><td>A single element or <code>null</code></td><td>Fastest; matches exactly one unique ID</td></tr>
+      <tr><td><code>document.getElementsByClassName('cls')</code></td><td><b>Live</b> HTMLCollection</td><td>Updates automatically as the DOM changes</td></tr>
+      <tr><td><code>document.getElementsByTagName('div')</code></td><td>Live HTMLCollection</td><td>All elements with that tag name</td></tr>
+      <tr><td><code>document.querySelector('.cls')</code></td><td>First matching element or <code>null</code></td><td>Accepts <b>any CSS selector</b> — most flexible</td></tr>
+      <tr><td><code>document.querySelectorAll('.cls')</code></td><td><b>Static</b> NodeList</td><td>Snapshot at call time; supports <code>.forEach()</code> directly</td></tr>
+    </table>
+
+<pre><code class="language-javascript">const title = document.getElementById('main-title');
+const firstCard = document.querySelector('.card');
+const allCards = document.querySelectorAll('.card');   // static NodeList
+allCards.forEach(card => console.log(card));</code></pre>
+
+    <h3>Reading and writing content</h3>
+    <table>
+      <tr><th>Property</th><th>What it does</th></tr>
+      <tr><td><code>.textContent</code></td><td>Gets/sets plain text only (fast, ignores hidden elements, safe from HTML injection)</td></tr>
+      <tr><td><code>.innerText</code></td><td>Gets/sets the <i>rendered</i> text (respects CSS visibility, triggers reflow — slower)</td></tr>
+      <tr><td><code>.innerHTML</code></td><td>Gets/sets content <b>as HTML markup</b>, parsed and rendered</td></tr>
+    </table>
+<pre><code class="language-javascript">title.textContent = 'Updated Title';       // safest for plain text
+title.innerHTML = '&lt;em&gt;Updated&lt;/em&gt; Title';   // parses the &lt;em&gt; tag</code></pre>
+    <div class="pitfall"><b>Common pitfall (security):</b> never assign untrusted/user-supplied data to <code>innerHTML</code> — it will be parsed and executed as real HTML/script, opening the page to Cross‑Site Scripting (XSS). Use <code>textContent</code> for any user-generated text.</div>
+  </section>
+
+  <!-- ============ TOPIC 3 ============ -->
+  <h2 class="qhead">3. Working with DOM Nodes — Add, Remove, Update</h2>
+  <section class="q">
+    <div class="diagram-box">
+      <svg viewBox="0 0 860 150" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Diagram: createElement builds a detached li element in memory; appendChild attaches it as the last child of the ul element, making it appear on the page.">
+        <defs><marker id="je3" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#b8860b"/></marker></defs>
+        <rect x="10" y="50" width="190" height="55" rx="8" fill="#fff9db" stroke="#b8860b" stroke-width="1.6"/>
+        <text x="105" y="72" text-anchor="middle" font-family="monospace" font-size="11" fill="#7a5300">document.createElement</text>
+        <text x="105" y="90" text-anchor="middle" font-family="monospace" font-size="10" fill="#7a5300">('li')  — detached node</text>
+
+        <rect x="250" y="50" width="190" height="55" rx="8" fill="#eef4ff" stroke="#2563eb" stroke-width="1.6"/>
+        <text x="345" y="72" text-anchor="middle" font-family="monospace" font-size="11" fill="#1a2b4c">li.textContent =</text>
+        <text x="345" y="90" text-anchor="middle" font-family="monospace" font-size="10" fill="#1a2b4c">'New item'</text>
+
+        <rect x="490" y="50" width="190" height="55" rx="8" fill="#f1f8f0" stroke="#3ca35c" stroke-width="1.6"/>
+        <text x="585" y="72" text-anchor="middle" font-family="monospace" font-size="11" fill="#1f4d2e">list.appendChild(li)</text>
+        <text x="585" y="90" text-anchor="middle" font-family="monospace" font-size="10" fill="#1f4d2e">attaches it to the DOM</text>
+
+        <rect x="730" y="50" width="120" height="55" rx="8" fill="#fdeef1" stroke="#c2185b" stroke-width="1.6"/>
+        <text x="790" y="78" text-anchor="middle" font-size="11" fill="#8a1245">Visible on page</text>
+
+        <line x1="200" y1="77" x2="248" y2="77" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#je3)"/>
+        <line x1="440" y1="77" x2="488" y2="77" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#je3)"/>
+        <line x1="680" y1="77" x2="728" y2="77" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#je3)"/>
+      </svg>
+      <div class="caption">Fig. 2 — A node created with <code>createElement</code> exists only in memory until it's attached somewhere in the live tree.</div>
+    </div>
+
+    <table>
+      <tr><th>Method</th><th>Effect</th></tr>
+      <tr><td><code>parent.appendChild(node)</code> / <code>parent.append(node)</code></td><td>Insert as the last child (<code>append()</code> also accepts plain strings and multiple nodes)</td></tr>
+      <tr><td><code>parent.prepend(node)</code></td><td>Insert as the first child</td></tr>
+      <tr><td><code>parent.insertBefore(new, ref)</code></td><td>Insert <code>new</code> right before the <code>ref</code> child</td></tr>
+      <tr><td><code>node.remove()</code></td><td>Remove the node from the DOM directly</td></tr>
+      <tr><td><code>parent.removeChild(node)</code></td><td>Older-style removal via the parent</td></tr>
+      <tr><td><code>parent.replaceChild(new, old)</code></td><td>Swap one node for another</td></tr>
+    </table>
+
+<pre><code class="language-javascript">const list = document.querySelector('#todo-list');
+
+const li = document.createElement('li');
+li.textContent = 'Buy milk';
+list.appendChild(li);              // add
+
+list.firstElementChild.remove();   // remove
+
+list.children[0].textContent = 'Updated item'; // update</code></pre>
+  </section>
+
+  <!-- ============ TOPIC 4 ============ -->
+  <h2 class="qhead">4. Attributes and Class Manipulation</h2>
+  <section class="q">
+    <table>
+      <tr><th>Method</th><th>Purpose</th></tr>
+      <tr><td><code>getAttribute(name)</code> / <code>setAttribute(name, val)</code></td><td>Read/write any HTML attribute generically</td></tr>
+      <tr><td><code>removeAttribute(name)</code> / <code>hasAttribute(name)</code></td><td>Remove / check presence of an attribute</td></tr>
+      <tr><td><code>element.dataset</code></td><td>Reads/writes custom <code>data-*</code> attributes as a JS object</td></tr>
+    </table>
+<pre><code class="language-javascript">const img = document.querySelector('img');
+img.setAttribute('alt', 'A mountain landscape');
+console.log(img.getAttribute('src'));
+
+// &lt;div data-user-id="42"&gt; ...
+console.log(div.dataset.userId);   // "42"</code></pre>
+
+    <h3><code>classList</code> — the preferred way to toggle styling</h3>
+    <div class="diagram-box">
+      <svg viewBox="0 0 780 130" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Diagram: four classList operations - add appends a class, remove deletes a class, toggle switches a class on or off, and contains checks whether a class is present.">
+        <rect x="10" y="20" width="170" height="90" rx="8" fill="#f1f8f0" stroke="#3ca35c" stroke-width="1.5"/>
+        <text x="95" y="45" text-anchor="middle" font-family="monospace" font-size="11" fill="#1f4d2e">.add('active')</text>
+        <text x="95" y="80" text-anchor="middle" font-size="10" fill="#1f4d2e">class gets added</text>
+
+        <rect x="200" y="20" width="170" height="90" rx="8" fill="#fdeef1" stroke="#c2185b" stroke-width="1.5"/>
+        <text x="285" y="45" text-anchor="middle" font-family="monospace" font-size="11" fill="#8a1245">.remove('active')</text>
+        <text x="285" y="80" text-anchor="middle" font-size="10" fill="#8a1245">class gets removed</text>
+
+        <rect x="390" y="20" width="170" height="90" rx="8" fill="#eef4ff" stroke="#2563eb" stroke-width="1.5"/>
+        <text x="475" y="45" text-anchor="middle" font-family="monospace" font-size="11" fill="#1a2b4c">.toggle('active')</text>
+        <text x="475" y="80" text-anchor="middle" font-size="10" fill="#1a2b4c">on ↔ off each call</text>
+
+        <rect x="580" y="20" width="180" height="90" rx="8" fill="#fff9db" stroke="#b8860b" stroke-width="1.5"/>
+        <text x="670" y="45" text-anchor="middle" font-family="monospace" font-size="11" fill="#7a5300">.contains('active')</text>
+        <text x="670" y="80" text-anchor="middle" font-size="10" fill="#7a5300">returns true / false</text>
+      </svg>
+      <div class="caption">Fig. 3 — <code>classList</code> lets JS toggle pre-defined CSS classes instead of writing individual style properties by hand.</div>
+    </div>
+<pre><code class="language-javascript">const box = document.querySelector('.box');
+box.classList.add('highlight');
+box.classList.remove('hidden');
+box.classList.toggle('open');          // flips it on/off
+console.log(box.classList.contains('open'));</code></pre>
+    <div class="callout"><b>Best practice:</b> prefer <code>classList</code> + CSS classes over directly setting <code>element.style.xxx</code> — it keeps presentation rules in the CSS file where they belong, and one class can toggle many properties at once.</div>
+  </section>
+
+  <!-- ============ TOPIC 5 ============ -->
+  <h2 class="qhead">5. Events and Event Listeners</h2>
+  <section class="q">
+    <p>An <b>event</b> is a signal that something happened (a click, a key press, a page finishing loading). <code>addEventListener(type, handler)</code> registers a function to run whenever that event occurs on an element.<sup>[2]</sup></p>
+    <table>
+      <tr><th>Category</th><th>Common event types</th></tr>
+      <tr><td>Mouse</td><td><code>click</code>, <code>dblclick</code>, <code>mouseover</code>, <code>mouseout</code>, <code>mousedown</code>, <code>mouseup</code>, <code>mousemove</code></td></tr>
+      <tr><td>Keyboard</td><td><code>keydown</code>, <code>keyup</code></td></tr>
+      <tr><td>Form</td><td><code>submit</code>, <code>change</code>, <code>input</code>, <code>focus</code>, <code>blur</code></td></tr>
+      <tr><td>Document/window</td><td><code>DOMContentLoaded</code>, <code>load</code>, <code>resize</code>, <code>scroll</code></td></tr>
+    </table>
+
+<pre><code class="language-javascript">const btn = document.querySelector('#save-btn');
+
+function handleClick(event) {
+  console.log('Clicked element:', event.target);
+  event.preventDefault();      // stop the default browser action (e.g. form submit/navigation)
+}
+
+btn.addEventListener('click', handleClick);
+btn.removeEventListener('click', handleClick);  // needs the SAME named function reference</code></pre>
+
+    <h3>The event object</h3>
+    <table>
+      <tr><th>Property/method</th><th>Meaning</th></tr>
+      <tr><td><code>event.target</code></td><td>The exact element the event originated on</td></tr>
+      <tr><td><code>event.currentTarget</code></td><td>The element the listener is actually attached to</td></tr>
+      <tr><td><code>event.type</code></td><td>The event name, e.g. <code>"click"</code></td></tr>
+      <tr><td><code>event.preventDefault()</code></td><td>Cancels the browser's default behaviour for that event</td></tr>
+      <tr><td><code>event.stopPropagation()</code></td><td>Stops the event from continuing to bubble/capture further</td></tr>
+    </table>
+  </section>
+
+  <!-- ============ TOPIC 6 ============ -->
+  <h2 class="qhead">6. Event Delegation, Bubbling, and Capturing</h2>
+  <section class="q">
+    <p>When an event fires on a nested element, it travels through the DOM tree in <b>three phases</b>: it first <b>captures</b> downward from <code>window</code> to the target, reaches the <b>target</b> itself, then <b>bubbles</b> back upward to <code>window</code>.<sup>[3]</sup></p>
+
+    <div class="diagram-box">
+      <svg viewBox="0 0 700 260" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Diagram: an event travels down from window through document, html, and body to the target button during the capturing phase, then bubbles back up through the same elements during the bubbling phase.">
+        <defs><marker id="je4" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#2563eb"/></marker>
+        <marker id="je5" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#c2185b"/></marker></defs>
+        <rect x="60" y="10" width="140" height="30" rx="5" fill="#eef4ff" stroke="#2563eb"/>
+        <text x="130" y="30" text-anchor="middle" font-family="monospace" font-size="11" fill="#1a2b4c">window</text>
+        <rect x="60" y="60" width="140" height="30" rx="5" fill="#eef4ff" stroke="#2563eb"/>
+        <text x="130" y="80" text-anchor="middle" font-family="monospace" font-size="11" fill="#1a2b4c">document</text>
+        <rect x="60" y="110" width="140" height="30" rx="5" fill="#eef4ff" stroke="#2563eb"/>
+        <text x="130" y="130" text-anchor="middle" font-family="monospace" font-size="11" fill="#1a2b4c">div#app</text>
+        <rect x="60" y="160" width="140" height="30" rx="5" fill="#fff9db" stroke="#b8860b" stroke-width="2"/>
+        <text x="130" y="180" text-anchor="middle" font-family="monospace" font-size="11" fill="#7a5300">button (target)</text>
+
+        <line x1="100" y1="42" x2="100" y2="58" stroke="#2563eb" stroke-width="1.8" marker-end="url(#je4)"/>
+        <line x1="100" y1="92" x2="100" y2="108" stroke="#2563eb" stroke-width="1.8" marker-end="url(#je4)"/>
+        <line x1="100" y1="142" x2="100" y2="158" stroke="#2563eb" stroke-width="1.8" marker-end="url(#je4)"/>
+        <text x="30" y="105" font-size="10" fill="#1a2b4c" text-anchor="middle">CAPTURE</text>
+
+        <line x1="165" y1="158" x2="165" y2="142" stroke="#c2185b" stroke-width="1.8" marker-end="url(#je5)"/>
+        <line x1="165" y1="108" x2="165" y2="92" stroke="#c2185b" stroke-width="1.8" marker-end="url(#je5)"/>
+        <line x1="165" y1="58" x2="165" y2="42" stroke="#c2185b" stroke-width="1.8" marker-end="url(#je5)"/>
+        <text x="235" y="105" font-size="10" fill="#c2185b" text-anchor="middle">BUBBLE</text>
+
+        <text x="400" y="115" font-size="11" fill="#334155">Default: addEventListener(type, fn) listens</text>
+        <text x="400" y="132" font-size="11" fill="#334155">during the BUBBLING phase.</text>
+        <text x="400" y="160" font-size="11" fill="#334155">addEventListener(type, fn, true) listens</text>
+        <text x="400" y="177" font-size="11" fill="#334155">during the CAPTURING phase instead.</text>
+      </svg>
+      <div class="caption">Fig. 4 — Both phases visit every ancestor; by default listeners run on the way back up (bubbling) unless the third argument requests capturing.</div>
+    </div>
+
+    <h3>Event delegation — one listener for many children</h3>
+    <p>Because events bubble, a single listener on a common <b>parent</b> can handle events from any of its current or future children by inspecting <code>event.target</code>. This avoids attaching (and re-attaching) a listener to every individual item.</p>
+<pre><code class="language-javascript">// Instead of adding a click listener to every &lt;li&gt;...
+document.querySelector('#todo-list').addEventListener('click', (event) => {
+  if (event.target.matches('.delete-btn')) {
+    event.target.closest('li').remove();
+  }
+});
+// Works even for &lt;li&gt; items added to the list LATER —
+// no need to re-bind a new listener to each new item.</code></pre>
+
+    <table>
+      <tr><th>Advantages of delegation</th></tr>
+      <tr><td>Fewer total event listeners → lower memory use, faster setup</td></tr>
+      <tr><td>Automatically covers elements added to the DOM after the listener was set up</td></tr>
+      <tr><td>One place to update the handling logic instead of many</td></tr>
+    </table>
+    <div class="pitfall"><b>Common pitfall:</b> forgetting that <code>stopPropagation()</code> inside a child's own handler will prevent a delegated listener on an ancestor from ever seeing that event.</div>
+  </section>
+
+  <!-- ============ TOPIC 7 ============ -->
+  <h2 class="qhead">7. Virtual DOM vs. Real DOM — Conceptual Introduction</h2>
+  <section class="q">
+    <p>The <b>Real DOM</b> is the browser's actual, live tree — every direct mutation can trigger expensive layout recalculation (reflow) and repaint. Libraries like React introduced the <b>Virtual DOM</b>: a lightweight, in‑memory JavaScript object tree that mirrors the UI. When state changes, a new virtual tree is built and <i>diffed</i> against the previous one, and only the minimal set of real DOM changes needed is applied.<sup>[4]</sup></p>
+    <table>
+      <tr><th>Aspect</th><th>Real DOM</th><th>Virtual DOM</th></tr>
+      <tr><td>What it is</td><td>The browser's live rendered tree</td><td>A plain JS object tree mirroring the UI</td></tr>
+      <tr><td>Update cost</td><td>Expensive — reflow/repaint on every direct change</td><td>Cheap — comparing JS objects has no rendering cost</td></tr>
+      <tr><td>Who updates it</td><td>Your code, directly, when using plain JS DOM methods</td><td>The library's reconciler, after diffing, in batched, minimal steps</td></tr>
+    </table>
+    <div class="callout"><b>Key point:</b> this is a conceptual bridge to frameworks like React — plain JS (as in this unit) manipulates the real DOM directly, which is fine for small amounts of change, but becomes a performance bottleneck for apps with frequent, widespread UI updates, which is the problem the virtual DOM pattern was designed to solve.</div>
+  </section>
+
+  <!-- ============ TOPIC 8 ============ -->
+  <h2 class="qhead">8. Modern Best Practices — Separation of JS and HTML</h2>
+  <section class="q">
+    <p>"Unobtrusive JavaScript" is the practice of keeping structure (HTML), presentation (CSS), and behaviour (JS) in separate files/layers, connected only through IDs, classes, and <code>data-*</code> attributes — never mixed inline.</p>
+    <div class="diagram-box">
+      <svg viewBox="0 0 700 150" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Diagram: three separated layers - HTML for structure, CSS for presentation, and JavaScript for behavior - connected only through element selectors, not mixed together.">
+        <rect x="20" y="20" width="200" height="100" rx="8" fill="#fdeef1" stroke="#c2185b" stroke-width="1.6"/>
+        <text x="120" y="60" text-anchor="middle" font-size="12" fill="#8a1245" font-weight="bold">HTML</text>
+        <text x="120" y="82" text-anchor="middle" font-size="10.5" fill="#8a1245">structure only</text>
+
+        <rect x="250" y="20" width="200" height="100" rx="8" fill="#eef4ff" stroke="#2563eb" stroke-width="1.6"/>
+        <text x="350" y="60" text-anchor="middle" font-size="12" fill="#1a2b4c" font-weight="bold">CSS</text>
+        <text x="350" y="82" text-anchor="middle" font-size="10.5" fill="#1a2b4c">presentation only</text>
+
+        <rect x="480" y="20" width="200" height="100" rx="8" fill="#fff9db" stroke="#b8860b" stroke-width="1.6"/>
+        <text x="580" y="60" text-anchor="middle" font-size="12" fill="#7a5300" font-weight="bold">JavaScript</text>
+        <text x="580" y="82" text-anchor="middle" font-size="10.5" fill="#7a5300">behaviour only</text>
+
+        <text x="350" y="140" text-anchor="middle" font-size="10.5" fill="#334155">connected only via IDs / classes / data-* attributes — never mixed together</text>
+      </svg>
+      <div class="caption">Fig. 5 — Each layer can be changed independently: redesign the CSS without touching JS, or change behaviour without editing markup.</div>
+    </div>
+<pre><code class="language-html">&lt;!-- Avoid: JS mixed directly into HTML --&gt;
+&lt;button onclick="deleteItem()"&gt;Delete&lt;/button&gt;
+&lt;div style="display:none;" id="panel"&gt;...&lt;/div&gt;</code></pre>
+<pre><code class="language-javascript">// Prefer: HTML stays clean; behaviour lives in JS, styling in CSS
+document.querySelector('#delete-btn').addEventListener('click', deleteItem);
+document.querySelector('#panel').classList.toggle('is-hidden'); // CSS: .is-hidden { display: none; }</code></pre>
+    <table>
+      <tr><th>Practice</th><th>Why</th></tr>
+      <tr><td>No inline <code>onclick=""</code> attributes</td><td>Keeps behaviour in one place, easier to find/maintain, no HTML re-parsing per handler string</td></tr>
+      <tr><td>Toggle CSS classes, not inline <code>style</code></td><td>Presentation rules stay centralised and cacheable in the stylesheet</td></tr>
+      <tr><td>Wrap script in <code>DOMContentLoaded</code> or place <code>&lt;script defer&gt;</code></td><td>Guarantees the DOM exists before your JS tries to select elements</td></tr>
+      <tr><td>Use <code>data-*</code> attributes to pass data to JS</td><td>Avoids scattering "magic strings" through both HTML and JS</td></tr>
+    </table>
+  </section>
+
+  <h2 class="qhead">Quick Recap — JS Unit 2 Cheat Sheet</h2>
+  <section class="q">
+    <table>
+      <tr><th>Term</th><th>One-line meaning</th></tr>
+      <tr><td>DOM</td><td>Browser's live, in-memory tree representation of the page</td></tr>
+      <tr><td><code>querySelector(All)</code></td><td>CSS-selector-based element lookup; most flexible selection method</td></tr>
+      <tr><td><code>textContent</code> vs <code>innerHTML</code></td><td>Safe plain text vs. parsed HTML markup (XSS risk with untrusted input)</td></tr>
+      <tr><td><code>createElement</code> + <code>appendChild</code></td><td>Build a node in memory, then attach it to the live tree</td></tr>
+      <tr><td><code>classList.add/remove/toggle</code></td><td>Preferred way to change an element's styling state</td></tr>
+      <tr><td><code>addEventListener(type, fn)</code></td><td>Registers a handler; runs during the bubbling phase by default</td></tr>
+      <tr><td>Capturing phase</td><td>Event travels from <code>window</code> down to the target</td></tr>
+      <tr><td>Bubbling phase</td><td>Event travels from the target back up to <code>window</code></td></tr>
+      <tr><td>Event delegation</td><td>One listener on a parent, using <code>event.target</code> to handle many/future children</td></tr>
+      <tr><td>Virtual DOM</td><td>In-memory JS tree diffed before applying minimal real DOM updates</td></tr>
+      <tr><td>Unobtrusive JS</td><td>Keep HTML/CSS/JS in separate layers connected via selectors only</td></tr>
+    </table>
+  </section>
+
+  <div class="sources">
+    <b>Sources referenced</b>
+    <ol>
+      <li>[1] <a href="https://developer.mozilla.org/en-US/docs/Web/API/Document_Object_Model" target="_blank">MDN — Document Object Model (DOM)</a></li>
+      <li>[2] <a href="https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener" target="_blank">MDN — EventTarget.addEventListener()</a></li>
+      <li>[3] <a href="https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Scripting/Event_bubbling" target="_blank">MDN — Event bubbling and capturing</a></li>
+      <li>[4] <a href="https://legacy.reactjs.org/docs/faq-internals.html" target="_blank">React docs (legacy) — Virtual DOM and internals</a></li>
+    </ol>
+  </div>
+
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
+</body>
+</html>

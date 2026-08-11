@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>JS Unit 1 — JavaScript and Modern Syntax</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/vs2015.min.css">
+<link rel="stylesheet" href="js-notes.css">
+</head>
+<body>
+<div class="page">
+
+  <div class="topbar">
+    <h1>Unit 1 — JavaScript and Modern Syntax</h1>
+    <div class="meta">Execution Environment &nbsp;•&nbsp; Variables &nbsp;•&nbsp; Data Types &nbsp;•&nbsp; Operators &nbsp;•&nbsp; Arrays &amp; Strings &nbsp;•&nbsp; Loops &nbsp;•&nbsp; Functions &nbsp;•&nbsp; Objects &nbsp;•&nbsp; ES6+</div>
+  </div>
+
+  <div class="nav">
+    <a class="home-btn" href="index.html" title="Back to home" aria-label="Back to home"><svg viewBox="0 0 24 24"><path d="M12 3l9 8h-3v9h-5v-6h-2v6H6v-9H3l9-8z"/></svg></a>
+    <a class="active" href="js_unit1_modern_syntax.html">JS Unit 1 · Modern Syntax</a>
+    <a href="js_unit2_dom_events.html">JS Unit 2 · DOM &amp; Events</a>
+  </div>
+
+  <!-- ============ TOPIC 1 ============ -->
+  <h2 class="qhead">1. Introduction to JavaScript and the Execution Environment</h2>
+  <section class="q">
+    <p>JavaScript is a high‑level, interpreted (just‑in‑time compiled), single‑threaded, dynamically‑typed programming language. The core language is standardised as <b>ECMAScript</b>; every place JS actually runs — a browser, Node.js — is a <b>host environment</b> that plugs extra objects into that core (the browser adds <code>window</code>, the DOM, <code>fetch</code>; Node adds <code>fs</code>, <code>process</code>, etc.).<sup>[1]</sup></p>
+
+    <h3>Statements and comments</h3>
+    <p>A JavaScript program is a sequence of <b>statements</b> — complete instructions such as a declaration, an assignment, or a function call, conventionally ended with a semicolon (JS also has <i>Automatic Semicolon Insertion</i>, which inserts missing semicolons for you in most cases, but relying on it can cause subtle bugs).</p>
+<pre><code class="language-javascript">// A single-line comment
+let x = 5; // statement: declare and initialise a variable
+
+/* A multi-line comment
+   can span several lines */
+console.log(x); // statement: function call</code></pre>
+
+    <h3>Execution context and the call stack</h3>
+    <p>When a script starts, the engine creates a <b>Global Execution Context</b>. Every function call creates its own execution context, which is pushed onto the <b>call stack</b>; when the function returns, its context is popped off. Each context is built in two phases: a <b>creation phase</b> (memory is allocated for variables/functions — this is what causes <i>hoisting</i>) and an <b>execution phase</b> (code actually runs line by line).</p>
+
+    <h3>The event loop — how single-threaded JS handles async work</h3>
+    <p>JavaScript has exactly <b>one</b> call stack, so it can only do one thing at a time. Asynchronous behaviour (timers, network requests, DOM events) is possible because the host environment provides <b>Web APIs</b> that run outside the call stack; when they finish, their callback is placed in a <b>queue</b>, and the <b>event loop</b> continuously checks: "is the call stack empty? If so, move the next queued callback onto it."<sup>[2]</sup></p>
+
+    <div class="diagram-box">
+      <svg viewBox="0 0 900 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Diagram: the call stack executes synchronous code; async calls like setTimeout are handed to Web APIs; when they finish, their callback moves to the callback queue; the event loop moves it to the call stack once the stack is empty.">
+        <defs><marker id="je1" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#b8860b"/></marker></defs>
+        <rect x="20" y="20" width="220" height="150" rx="8" fill="#fff9db" stroke="#b8860b" stroke-width="1.6"/>
+        <text x="130" y="42" text-anchor="middle" font-size="12" fill="#7a5300" font-weight="bold">Call Stack</text>
+        <rect x="45" y="110" width="170" height="26" rx="4" fill="#fff" stroke="#d4a017"/>
+        <text x="130" y="128" text-anchor="middle" font-family="monospace" font-size="10.5" fill="#7a5300">console.log('hi')</text>
+        <rect x="45" y="76" width="170" height="26" rx="4" fill="#fff" stroke="#d4a017"/>
+        <text x="130" y="94" text-anchor="middle" font-family="monospace" font-size="10.5" fill="#7a5300">main()</text>
+
+        <rect x="330" y="20" width="220" height="150" rx="8" fill="#eef4ff" stroke="#2563eb" stroke-width="1.6"/>
+        <text x="440" y="42" text-anchor="middle" font-size="12" fill="#1a2b4c" font-weight="bold">Web APIs</text>
+        <text x="440" y="90" text-anchor="middle" font-family="monospace" font-size="10.5" fill="#1a2b4c">setTimeout(fn, 2000)</text>
+        <text x="440" y="112" text-anchor="middle" font-family="monospace" font-size="10.5" fill="#1a2b4c">fetch(url)</text>
+        <text x="440" y="134" text-anchor="middle" font-family="monospace" font-size="10.5" fill="#1a2b4c">addEventListener(...)</text>
+
+        <rect x="640" y="110" width="240" height="60" rx="8" fill="#f1f8f0" stroke="#3ca35c" stroke-width="1.6"/>
+        <text x="760" y="132" text-anchor="middle" font-size="12" fill="#1f4d2e" font-weight="bold">Callback / Task Queue</text>
+        <text x="760" y="152" text-anchor="middle" font-family="monospace" font-size="10.5" fill="#1f4d2e">fn (ready to run)</text>
+
+        <line x1="240" y1="95" x2="328" y2="95" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#je1)"/>
+        <text x="284" y="86" text-anchor="middle" font-size="9.5" fill="#475569">handed off</text>
+
+        <line x1="550" y1="140" x2="638" y2="140" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#je1)"/>
+        <text x="594" y="131" text-anchor="middle" font-size="9.5" fill="#475569">on completion</text>
+
+        <path d="M 760 172 C 760 230, 240 230, 130 172" stroke="#b8860b" stroke-width="2" fill="none" marker-end="url(#je1)"/>
+        <text x="440" y="250" text-anchor="middle" font-size="11" fill="#7a5300" font-weight="bold">Event Loop: "is the call stack empty? push the next queued callback"</text>
+      </svg>
+      <div class="caption">Fig. 1 — The event loop only moves a callback onto the call stack once the stack is completely empty, which is why a <code>setTimeout(fn, 0)</code> still runs after all currently‑running synchronous code.</div>
+    </div>
+
+    <span class="filelabel">console</span>
+<pre><code class="language-javascript">console.log('1: start');
+setTimeout(() => console.log('2: from setTimeout'), 0);
+console.log('3: end');
+
+// Output order: 1: start → 3: end → 2: from setTimeout
+// setTimeout's callback waits for the call stack to empty first,
+// even with a 0ms delay.</code></pre>
+
+    <div class="callout"><b>Key point:</b> JavaScript itself is single‑threaded — the concurrency you see (timers, network calls, UI responsiveness) comes from the host environment's APIs plus the event loop, not from JS running multiple things literally at once.</div>
+  </section>
+
+  <!-- ============ TOPIC 2 ============ -->
+  <h2 class="qhead">2. Variables — var, let, and const</h2>
+  <section class="q">
+    <p>JavaScript has three variable declaration keywords, introduced at different points in the language's history, with different scoping and hoisting rules.<sup>[3]</sup></p>
+
+    <table>
+      <tr><th>Aspect</th><th><code>var</code></th><th><code>let</code></th><th><code>const</code></th></tr>
+      <tr><td>Scope</td><td>Function-scoped</td><td>Block-scoped (<code>{ }</code>)</td><td>Block-scoped</td></tr>
+      <tr><td>Hoisting</td><td>Hoisted &amp; initialised to <code>undefined</code></td><td>Hoisted, but in the <b>Temporal Dead Zone</b> until declared</td><td>Hoisted, also in the TDZ</td></tr>
+      <tr><td>Re-declaration</td><td>Allowed</td><td>Not allowed in the same scope</td><td>Not allowed</td></tr>
+      <tr><td>Re-assignment</td><td>Allowed</td><td>Allowed</td><td><b>Not allowed</b> (the binding is constant)</td></tr>
+      <tr><td>Attaches to <code>window</code>?</td><td>Yes (in global scope, browsers)</td><td>No</td><td>No</td></tr>
+    </table>
+
+    <div class="diagram-box">
+      <svg viewBox="0 0 800 220" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Diagram: var declared inside a block leaks out to the enclosing function scope, while let and const declared inside a block stay contained within that block.">
+        <rect x="20" y="20" width="360" height="180" rx="10" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="4 3"/>
+        <text x="200" y="42" text-anchor="middle" font-size="12" fill="#334155" font-weight="bold">function scope</text>
+        <rect x="45" y="60" width="310" height="110" rx="8" fill="#fef2f2" stroke="#dc2626" stroke-width="1.3" stroke-dasharray="3 2"/>
+        <text x="200" y="80" text-anchor="middle" font-size="11" fill="#b91c1c">if (true) { block }</text>
+        <text x="200" y="105" text-anchor="middle" font-family="monospace" font-size="11" fill="#b91c1c">var a = 1;</text>
+        <text x="200" y="150" text-anchor="middle" font-size="10" fill="#b91c1c">↓ leaks out of the block ↓</text>
+        <text x="200" y="190" text-anchor="middle" font-family="monospace" font-size="11" fill="#334155">console.log(a); // 1 (works)</text>
+
+        <rect x="420" y="20" width="360" height="180" rx="10" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="4 3"/>
+        <text x="600" y="42" text-anchor="middle" font-size="12" fill="#334155" font-weight="bold">function scope</text>
+        <rect x="445" y="60" width="310" height="110" rx="8" fill="#f1f8f0" stroke="#15803d" stroke-width="1.3" stroke-dasharray="3 2"/>
+        <text x="600" y="80" text-anchor="middle" font-size="11" fill="#0c4a2f">if (true) { block }</text>
+        <text x="600" y="105" text-anchor="middle" font-family="monospace" font-size="11" fill="#0c4a2f">let b = 1;</text>
+        <text x="600" y="140" text-anchor="middle" font-size="10" fill="#0c4a2f">✕ stays inside the block</text>
+        <text x="600" y="190" text-anchor="middle" font-family="monospace" font-size="11" fill="#334155">console.log(b); // ReferenceError</text>
+      </svg>
+      <div class="caption">Fig. 2 — <code>var</code> ignores block boundaries (only function boundaries stop it); <code>let</code>/<code>const</code> respect every <code>{ }</code> block.</div>
+    </div>
+
+<pre><code class="language-javascript">console.log(typeof x); // "undefined" — var is hoisted & pre-initialised
+var x = 10;
+
+console.log(typeof y); // ReferenceError — y is in the Temporal Dead Zone
+let y = 20;
+
+const PI = 3.14159;
+PI = 3;        // TypeError: Assignment to constant variable.
+
+const person = { name: 'Ada' };
+person.name = 'Grace';   // OK — the object's contents are still mutable,
+                          // only the *binding* `person` itself is constant.</code></pre>
+
+    <div class="pitfall"><b>Common pitfall:</b> <code>const</code> does not make an object or array immutable — it only prevents the variable from being <i>reassigned</i> to a different value. Use <code>Object.freeze()</code> if true immutability is required.</div>
+
+    <p><b>Modern best practice:</b> default to <code>const</code>; use <code>let</code> only when a variable must be reassigned (loop counters, accumulators); avoid <code>var</code> in new code.</p>
+  </section>
+
+  <!-- ============ TOPIC 3 ============ -->
+  <h2 class="qhead">3. Data Types and Type Conversion</h2>
+  <section class="q">
+    <p>JavaScript has 7 <b>primitive</b> types and one composite type — <b>object</b> (which also covers arrays and functions). Primitives are immutable and copied <i>by value</i>; objects are copied/assigned <i>by reference</i>.<sup>[4]</sup></p>
+
+    <table>
+      <tr><th>Primitive type</th><th>Example</th><th><code>typeof</code> result</th></tr>
+      <tr><td>String</td><td><code>'hello'</code></td><td><code>"string"</code></td></tr>
+      <tr><td>Number</td><td><code>42</code>, <code>3.14</code></td><td><code>"number"</code></td></tr>
+      <tr><td>Boolean</td><td><code>true</code></td><td><code>"boolean"</code></td></tr>
+      <tr><td>Undefined</td><td>a declared but unassigned variable</td><td><code>"undefined"</code></td></tr>
+      <tr><td>Null</td><td>intentional "no value"</td><td><code>"object"</code> (a long-standing language quirk)</td></tr>
+      <tr><td>Symbol</td><td><code>Symbol('id')</code> — unique identifier</td><td><code>"symbol"</code></td></tr>
+      <tr><td>BigInt</td><td><code>123n</code> — arbitrary-precision integer</td><td><code>"bigint"</code></td></tr>
+    </table>
+
+    <div class="diagram-box">
+      <svg viewBox="0 0 800 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Diagram: primitive variables on the stack hold their value directly; object variables on the stack hold a reference pointing to the actual object data stored on the heap.">
+        <rect x="20" y="20" width="330" height="200" rx="8" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.4"/>
+        <text x="185" y="42" text-anchor="middle" font-size="12" fill="#334155" font-weight="bold">Stack (primitives — stored by value)</text>
+        <rect x="45" y="60" width="280" height="30" rx="5" fill="#fff9db" stroke="#b8860b"/>
+        <text x="185" y="80" text-anchor="middle" font-family="monospace" font-size="11" fill="#7a5300">let a = 5;   →  a: 5</text>
+        <rect x="45" y="100" width="280" height="30" rx="5" fill="#fff9db" stroke="#b8860b"/>
+        <text x="185" y="120" text-anchor="middle" font-family="monospace" font-size="11" fill="#7a5300">let b = a;   →  b: 5 (copy)</text>
+        <text x="185" y="160" text-anchor="middle" font-size="10.5" fill="#334155">b = 10 does NOT change a</text>
+
+        <rect x="430" y="20" width="350" height="200" rx="8" fill="#eef4ff" stroke="#2563eb" stroke-width="1.4"/>
+        <text x="605" y="42" text-anchor="middle" font-size="12" fill="#1a2b4c" font-weight="bold">Stack + Heap (objects — by reference)</text>
+        <rect x="455" y="60" width="150" height="30" rx="5" fill="#fff" stroke="#2563eb"/>
+        <text x="530" y="80" text-anchor="middle" font-family="monospace" font-size="10.5" fill="#1a2b4c">let obj1 = {…}</text>
+        <rect x="455" y="100" width="150" height="30" rx="5" fill="#fff" stroke="#2563eb"/>
+        <text x="530" y="120" text-anchor="middle" font-family="monospace" font-size="10.5" fill="#1a2b4c">let obj2 = obj1</text>
+        <rect x="640" y="80" width="120" height="40" rx="6" fill="#dbe8ff" stroke="#2563eb" stroke-width="1.6"/>
+        <text x="700" y="104" text-anchor="middle" font-family="monospace" font-size="10.5" fill="#1a2b4c">{ x: 1 }</text>
+        <line x1="605" y1="75" x2="638" y2="95" stroke="#2563eb" stroke-width="1.5"/>
+        <line x1="605" y1="115" x2="638" y2="105" stroke="#2563eb" stroke-width="1.5"/>
+        <text x="605" y="170" text-anchor="middle" font-size="10.5" fill="#1a2b4c">obj1 AND obj2 point to the SAME object —</text>
+        <text x="605" y="188" text-anchor="middle" font-size="10.5" fill="#1a2b4c">mutating one is visible through the other</text>
+      </svg>
+      <div class="caption">Fig. 3 — Copying a primitive copies its value; copying an object copies only the <i>reference</i> to the same underlying data.</div>
+    </div>
+
+    <h3>Type conversion (coercion)</h3>
+    <p><b>Implicit conversion</b> happens automatically when operators are used across mismatched types; <b>explicit conversion</b> is done deliberately with functions like <code>Number()</code>, <code>String()</code>, <code>Boolean()</code>, or <code>parseInt()</code>.</p>
+<pre><code class="language-javascript">// Implicit (coercion)
+'5' + 3        // "53"  → number 3 is coerced to a string, then concatenated
+'5' - 3        // 2     → string '5' is coerced to a number for subtraction
+true + 1       // 2     → true coerces to 1
+
+// Explicit
+Number('42')   // 42
+String(42)     // "42"
+Boolean('')    // false  (empty string is "falsy")
+Boolean('0')   // true   (a non-empty string is always "truthy")</code></pre>
+
+    <table>
+      <tr><th><code>==</code> (loose equality)</th><th><code>===</code> (strict equality)</th></tr>
+      <tr><td>Coerces operands to the same type before comparing</td><td>Compares both value <b>and</b> type, no coercion</td></tr>
+      <tr><td><code>'5' == 5</code> → <code>true</code></td><td><code>'5' === 5</code> → <code>false</code></td></tr>
+      <tr><td><code>null == undefined</code> → <code>true</code></td><td><code>null === undefined</code> → <code>false</code></td></tr>
+    </table>
+    <div class="callout"><b>Best practice:</b> always prefer <code>===</code>/<code>!==</code> over <code>==</code>/<code>!=</code> — it avoids the surprising coercion rules and makes bugs far less likely.</div>
+  </section>
+
+  <!-- ============ TOPIC 4 ============ -->
+  <h2 class="qhead">4. Operators</h2>
+  <section class="q">
+    <table>
+      <tr><th>Category</th><th>Operators</th><th>Example</th></tr>
+      <tr><td>Arithmetic</td><td><code>+ - * / % **</code></td><td><code>2 ** 3 // 8</code></td></tr>
+      <tr><td>Assignment</td><td><code>= += -= *= /=</code></td><td><code>x += 5</code> ≡ <code>x = x + 5</code></td></tr>
+      <tr><td>Comparison</td><td><code>== === != !== &gt; &lt; &gt;= &lt;=</code></td><td><code>7 &gt; 3 // true</code></td></tr>
+      <tr><td>Logical</td><td><code>&amp;&amp; || !</code></td><td><code>isAdmin &amp;&amp; isActive</code></td></tr>
+      <tr><td>Ternary</td><td><code>condition ? a : b</code></td><td><code>age &gt;= 18 ? 'adult' : 'minor'</code></td></tr>
+      <tr><td>Nullish coalescing</td><td><code>??</code></td><td><code>value ?? 'default'</code> (only falls back on <code>null</code>/<code>undefined</code>, unlike <code>||</code>)</td></tr>
+      <tr><td>Optional chaining</td><td><code>?.</code></td><td><code>user?.address?.city</code> (short-circuits to <code>undefined</code> instead of throwing)</td></tr>
+    </table>
+<pre><code class="language-javascript">let count = 0;
+console.log(count || 10);   // 10 — 0 is falsy, so || falls through
+console.log(count ?? 10);   // 0  — 0 is not null/undefined, so ?? keeps it
+
+const user = { profile: null };
+console.log(user.profile?.age); // undefined, no error thrown</code></pre>
+    <div class="pitfall"><b>Common pitfall:</b> <code>||</code> falls back on <i>any</i> falsy value (<code>0</code>, <code>''</code>, <code>NaN</code>, <code>false</code>), which is usually not what you want for numeric defaults — <code>??</code> is the safer choice when the goal is specifically "handle missing/null values."</div>
+  </section>
+
+  <!-- ============ TOPIC 5 ============ -->
+  <h2 class="qhead">5. Arrays</h2>
+  <section class="q">
+    <p>An array is an ordered, zero-indexed, resizable list that can hold mixed types.</p>
+    <div class="diagram-box">
+      <svg viewBox="0 0 700 130" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Diagram: an array with four elements at indices 0 to 3, holding the values apple, banana, cherry, and date.">
+        <text x="30" y="30" font-family="monospace" font-size="12" fill="#334155">const fruits = ['apple', 'banana', 'cherry', 'date'];</text>
+        <rect x="30" y="50" width="150" height="50" rx="6" fill="#fff9db" stroke="#b8860b" stroke-width="1.6"/>
+        <text x="105" y="80" text-anchor="middle" font-family="monospace" font-size="11" fill="#7a5300">'apple'</text>
+        <text x="105" y="112" text-anchor="middle" font-size="10" fill="#64748b">index 0</text>
+
+        <rect x="185" y="50" width="150" height="50" rx="6" fill="#fff9db" stroke="#b8860b" stroke-width="1.6"/>
+        <text x="260" y="80" text-anchor="middle" font-family="monospace" font-size="11" fill="#7a5300">'banana'</text>
+        <text x="260" y="112" text-anchor="middle" font-size="10" fill="#64748b">index 1</text>
+
+        <rect x="340" y="50" width="150" height="50" rx="6" fill="#fff9db" stroke="#b8860b" stroke-width="1.6"/>
+        <text x="415" y="80" text-anchor="middle" font-family="monospace" font-size="11" fill="#7a5300">'cherry'</text>
+        <text x="415" y="112" text-anchor="middle" font-size="10" fill="#64748b">index 2</text>
+
+        <rect x="495" y="50" width="150" height="50" rx="6" fill="#fff9db" stroke="#b8860b" stroke-width="1.6"/>
+        <text x="570" y="80" text-anchor="middle" font-family="monospace" font-size="11" fill="#7a5300">'date'</text>
+        <text x="570" y="112" text-anchor="middle" font-size="10" fill="#64748b">index 3</text>
+      </svg>
+      <div class="caption">Fig. 4 — Indexing always starts at 0; <code>fruits.length</code> is 4, and <code>fruits[4]</code> is <code>undefined</code>.</div>
+    </div>
+
+    <table>
+      <tr><th>Method</th><th>What it does</th><th>Mutates original?</th></tr>
+      <tr><td><code>push()</code> / <code>pop()</code></td><td>Add/remove at the end</td><td>Yes</td></tr>
+      <tr><td><code>unshift()</code> / <code>shift()</code></td><td>Add/remove at the start</td><td>Yes</td></tr>
+      <tr><td><code>splice(i, n)</code></td><td>Remove/insert at index <code>i</code></td><td>Yes</td></tr>
+      <tr><td><code>map(fn)</code></td><td>New array of transformed elements</td><td>No</td></tr>
+      <tr><td><code>filter(fn)</code></td><td>New array of elements passing a test</td><td>No</td></tr>
+      <tr><td><code>reduce(fn, init)</code></td><td>Folds the array down to a single value</td><td>No</td></tr>
+      <tr><td><code>find(fn)</code> / <code>findIndex(fn)</code></td><td>First matching element / its index</td><td>No</td></tr>
+      <tr><td><code>slice(a, b)</code></td><td>Shallow copy of a portion</td><td>No</td></tr>
+      <tr><td><code>includes(v)</code></td><td>Boolean membership test</td><td>No</td></tr>
+    </table>
+<pre><code class="language-javascript">const prices = [10, 25, 40, 55];
+
+const withTax = prices.map(p => p * 1.18);      // [11.8, 29.5, 47.2, 64.9]
+const expensive = prices.filter(p => p > 20);    // [25, 40, 55]
+const total = prices.reduce((sum, p) => sum + p, 0); // 130</code></pre>
+    <div class="callout"><b>Key point:</b> <code>map</code>/<code>filter</code>/<code>reduce</code> never modify the original array — they return a new one, which makes code easier to reason about and is central to a functional, predictable coding style.</div>
+  </section>
+
+  <!-- ============ TOPIC 6 ============ -->
+  <h2 class="qhead">6. Strings</h2>
+  <section class="q">
+    <p>Strings are <b>immutable</b> sequences of UTF‑16 characters — every "modifying" string method actually returns a brand‑new string.</p>
+    <table>
+      <tr><th>Method / property</th><th>Purpose</th></tr>
+      <tr><td><code>.length</code></td><td>Number of characters</td></tr>
+      <tr><td><code>.slice(a, b)</code> / <code>.substring(a, b)</code></td><td>Extract a portion</td></tr>
+      <tr><td><code>.split(sep)</code></td><td>Break into an array using a separator</td></tr>
+      <tr><td><code>.trim()</code></td><td>Remove leading/trailing whitespace</td></tr>
+      <tr><td><code>.toUpperCase()</code> / <code>.toLowerCase()</code></td><td>Change case</td></tr>
+      <tr><td><code>.replace(a, b)</code> / <code>.replaceAll(a, b)</code></td><td>Substitute text</td></tr>
+      <tr><td><code>.includes()</code> / <code>.startsWith()</code> / <code>.endsWith()</code></td><td>Substring tests</td></tr>
+      <tr><td><code>.repeat(n)</code></td><td>Repeat the string <code>n</code> times</td></tr>
+    </table>
+
+    <h3>Template literals (ES6)</h3>
+    <p>Backtick‑delimited strings support <code>${expression}</code> interpolation and multi‑line text without concatenation:</p>
+<pre><code class="language-javascript">const name = 'Ada';
+const age = 30;
+
+// Old way
+const oldMsg = 'Hello, ' + name + '! You are ' + age + ' years old.';
+
+// Template literal
+const newMsg = `Hello, ${name}! You are ${age} years old.`;
+
+const multiLine = `Line one
+Line two`;</code></pre>
+  </section>
+
+  <!-- ============ TOPIC 7 ============ -->
+  <h2 class="qhead">7. Loops — for, while, for...of</h2>
+  <section class="q">
+    <table>
+      <tr><th>Loop</th><th>Best for</th><th>Example</th></tr>
+      <tr><td><code>for</code></td><td>A known number of iterations, needs the index</td><td><code>for (let i = 0; i &lt; 5; i++)</code></td></tr>
+      <tr><td><code>while</code></td><td>Repeat while a condition holds, iteration count unknown upfront</td><td><code>while (queue.length) {...}</code></td></tr>
+      <tr><td><code>do...while</code></td><td>Same as <code>while</code>, but body always runs at least once</td><td><code>do {...} while (cond)</code></td></tr>
+      <tr><td><code>for...of</code></td><td>Iterating <i>values</i> of arrays, strings, Maps, Sets (any iterable)</td><td><code>for (const item of arr)</code></td></tr>
+      <tr><td><code>for...in</code></td><td>Iterating enumerable <i>keys</i> of a plain object</td><td><code>for (const key in obj)</code></td></tr>
+    </table>
+
+    <div class="diagram-box">
+      <svg viewBox="0 0 720 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Flowchart: initialize the loop variable, check the condition; if true run the loop body then the increment step and re-check the condition; if false exit the loop.">
+        <defs><marker id="je2" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#b8860b"/></marker></defs>
+        <rect x="270" y="10" width="180" height="40" rx="6" fill="#fff9db" stroke="#b8860b" stroke-width="1.6"/>
+        <text x="360" y="35" text-anchor="middle" font-family="monospace" font-size="11" fill="#7a5300">let i = 0</text>
+
+        <polygon points="360,70 460,120 360,170 260,120" fill="#eef4ff" stroke="#2563eb" stroke-width="1.6"/>
+        <text x="360" y="115" text-anchor="middle" font-family="monospace" font-size="10.5" fill="#1a2b4c">i &lt; 5 ?</text>
+        <text x="360" y="132" text-anchor="middle" font-size="9.5" fill="#1a2b4c">condition</text>
+
+        <rect x="500" y="95" width="170" height="50" rx="6" fill="#f1f8f0" stroke="#3ca35c" stroke-width="1.6"/>
+        <text x="585" y="115" text-anchor="middle" font-size="11" fill="#1f4d2e">loop body runs</text>
+        <text x="585" y="132" text-anchor="middle" font-family="monospace" font-size="10" fill="#1f4d2e">i++</text>
+
+        <rect x="270" y="220" width="180" height="45" rx="6" fill="#fdeef1" stroke="#c2185b" stroke-width="1.6"/>
+        <text x="360" y="248" text-anchor="middle" font-size="11" fill="#8a1245">exit loop (i is false)</text>
+
+        <line x1="360" y1="50" x2="360" y2="68" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#je2)"/>
+        <line x1="460" y1="120" x2="498" y2="120" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#je2)"/>
+        <text x="480" y="110" font-size="9.5" fill="#334155">true</text>
+        <path d="M 585 145 C 585 200, 360 200, 360 168" stroke="#94a3b8" stroke-width="1.6" fill="none" marker-end="url(#je2)"/>
+        <text x="480" y="205" text-anchor="middle" font-size="9.5" fill="#334155">back to condition check</text>
+        <line x1="360" y1="170" x2="360" y2="218" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#je2)"/>
+        <text x="380" y="195" font-size="9.5" fill="#334155">false</text>
+      </svg>
+      <div class="caption">Fig. 5 — Every counting loop follows this same init → check → body → update → recheck cycle, whichever keyword is used.</div>
+    </div>
+
+<pre><code class="language-javascript">const nums = [10, 20, 30];
+
+for (let i = 0; i &lt; nums.length; i++) console.log(i, nums[i]);
+for (const n of nums) console.log(n);              // values: 10, 20, 30
+
+const obj = { a: 1, b: 2 };
+for (const key in obj) console.log(key, obj[key]);  // keys: a, b</code></pre>
+    <div class="pitfall"><b>Common pitfall:</b> using <code>for...in</code> on an array works but is discouraged — it iterates keys (as strings, including any inherited enumerable properties) rather than guaranteeing numeric order; use <code>for...of</code> or array methods on arrays instead.</div>
+  </section>
+
+  <!-- ============ TOPIC 8 ============ -->
+  <h2 class="qhead">8. Functions — Declarations and Arrow Functions</h2>
+  <section class="q">
+    <table>
+      <tr><th>Aspect</th><th>Function Declaration</th><th>Arrow Function</th></tr>
+      <tr><td>Syntax</td><td><code>function greet() {}</code></td><td><code>const greet = () => {}</code></td></tr>
+      <tr><td>Hoisting</td><td>Fully hoisted — callable before its definition</td><td>Not hoisted (it's a variable holding a function)</td></tr>
+      <tr><td><code>this</code> binding</td><td><b>Dynamic</b> — determined by how the function is called</td><td><b>Lexical</b> — inherits <code>this</code> from the surrounding scope</td></tr>
+      <tr><td>Own <code>arguments</code> object</td><td>Yes</td><td>No</td></tr>
+      <tr><td>Usable as a constructor (<code>new</code>)</td><td>Yes</td><td>No</td></tr>
+      <tr><td>Best for</td><td>Object methods, constructors, when dynamic <code>this</code> is wanted</td><td>Callbacks, array methods, preserving outer <code>this</code></td></tr>
+    </table>
+
+<pre><code class="language-javascript">const user = {
+  name: 'Ada',
+  greetRegular: function () {
+    console.log(this.name);           // "Ada" — `this` = the object it's called on
+  },
+  greetArrow: () => {
+    console.log(this.name);           // undefined — arrow has no own `this`;
+  }                                    // it uses `this` from where it was DEFINED
+};
+
+user.greetRegular(); // "Ada"
+user.greetArrow();   // undefined</code></pre>
+
+    <p>This is why arrow functions are so useful inside callbacks that need to keep the <i>outer</i> <code>this</code>:</p>
+<pre><code class="language-javascript">class Timer {
+  seconds = 0;
+  start() {
+    setInterval(() => {
+      this.seconds++;   // arrow function keeps `this` = the Timer instance
+    }, 1000);
+  }
+}</code></pre>
+
+    <h3>Function declaration vs. function expression</h3>
+    <p>A <b>declaration</b> (<code>function foo() {}</code>) is hoisted with its full body. A <b>function expression</b> (<code>const foo = function () {}</code>, including arrow functions) is only hoisted as a variable — calling it before the assignment line throws (or gives <code>undefined</code> for <code>var</code>).</p>
+  </section>
+
+  <!-- ============ TOPIC 9 ============ -->
+  <h2 class="qhead">9. Objects and Methods</h2>
+  <section class="q">
+    <p>An object is an unordered collection of <b>key–value pairs</b> ("properties"). A property whose value is a function is called a <b>method</b>.</p>
+<pre><code class="language-javascript">const car = {
+  brand: 'Toyota',
+  model: 'Corolla',
+  year: 2024,
+  start() {                       // ES6 method shorthand
+    console.log(`${this.brand} is starting...`);
+  }
+};
+
+console.log(car.brand);           // dot notation
+console.log(car['model']);        // bracket notation (needed for dynamic keys)
+car.start();                      // "Toyota is starting..."
+
+car.color = 'red';                // add a new property
+delete car.year;                  // remove a property
+
+console.log(Object.keys(car));    // ['brand', 'model', 'start', 'color']
+console.log(Object.values(car));
+console.log(Object.entries(car)); // [['brand','Toyota'], ...] — key/value pairs</code></pre>
+    <div class="callout"><b>Key point:</b> inside a regular method, <code>this</code> refers to "the object the method was called on" — <code>car.start()</code> sets <code>this</code> to <code>car</code>. Calling the same function without an object context (e.g. assigning it to a plain variable and calling it) loses that binding.</div>
+  </section>
+
+  <!-- ============ TOPIC 10 ============ -->
+  <h2 class="qhead">10. ES6+ Features: Destructuring, Template Literals, Spread &amp; Rest</h2>
+  <section class="q">
+    <h3>Destructuring — unpacking values into variables</h3>
+    <div class="diagram-box">
+      <svg viewBox="0 0 700 190" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Diagram: an object with properties name and age has arrows pointing from each property to a separate destructured variable of the same name.">
+        <rect x="30" y="30" width="220" height="120" rx="8" fill="#eef4ff" stroke="#2563eb" stroke-width="1.6"/>
+        <text x="140" y="52" text-anchor="middle" font-size="11" fill="#1a2b4c" font-weight="bold">{ name: 'Ada', age: 30 }</text>
+        <text x="140" y="90" text-anchor="middle" font-family="monospace" font-size="10.5" fill="#1a2b4c">name: 'Ada'</text>
+        <text x="140" y="115" text-anchor="middle" font-family="monospace" font-size="10.5" fill="#1a2b4c">age: 30</text>
+
+        <line x1="250" y1="90" x2="440" y2="70" stroke="#b8860b" stroke-width="1.6"/>
+        <line x1="250" y1="115" x2="440" y2="135" stroke="#b8860b" stroke-width="1.6"/>
+
+        <rect x="450" y="45" width="200" height="40" rx="6" fill="#fff9db" stroke="#b8860b" stroke-width="1.6"/>
+        <text x="550" y="70" text-anchor="middle" font-family="monospace" font-size="11" fill="#7a5300">const name = 'Ada'</text>
+        <rect x="450" y="110" width="200" height="40" rx="6" fill="#fff9db" stroke="#b8860b" stroke-width="1.6"/>
+        <text x="550" y="135" text-anchor="middle" font-family="monospace" font-size="11" fill="#7a5300">const age = 30</text>
+      </svg>
+      <div class="caption">Fig. 6 — <code>const { name, age } = user;</code> pulls two matching properties straight into two new variables in one line.</div>
+    </div>
+<pre><code class="language-javascript">// Object destructuring
+const user = { name: 'Ada', age: 30, country: 'UK' };
+const { name, age } = user;               // name = 'Ada', age = 30
+const { name: n, country: c = 'N/A' } = user; // rename + default value
+
+// Array destructuring
+const coords = [10, 20, 30];
+const [x, y] = coords;                    // x = 10, y = 20
+const [, , z] = coords;                   // skip elements: z = 30</code></pre>
+
+    <h3>Spread (<code>...</code>) vs. Rest (<code>...</code>)</h3>
+    <p>The same three dots mean opposite things depending on context: <b>spread</b> expands an iterable into individual elements; <b>rest</b> collects multiple individual items back into a single array.</p>
+    <div class="diagram-box">
+      <svg viewBox="0 0 720 190" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Diagram: spread operator expands an array into separate individual elements; rest operator collects separate individual arguments back into one array.">
+        <rect x="20" y="30" width="150" height="40" rx="6" fill="#eef4ff" stroke="#2563eb" stroke-width="1.6"/>
+        <text x="95" y="55" text-anchor="middle" font-family="monospace" font-size="10.5" fill="#1a2b4c">[1, 2, 3]</text>
+        <text x="200" y="55" font-size="11" fill="#334155">...spread→</text>
+        <rect x="280" y="20" width="60" height="30" rx="5" fill="#fff9db" stroke="#b8860b"/>
+        <text x="310" y="40" text-anchor="middle" font-family="monospace" font-size="10.5" fill="#7a5300">1</text>
+        <rect x="350" y="20" width="60" height="30" rx="5" fill="#fff9db" stroke="#b8860b"/>
+        <text x="380" y="40" text-anchor="middle" font-family="monospace" font-size="10.5" fill="#7a5300">2</text>
+        <rect x="420" y="20" width="60" height="30" rx="5" fill="#fff9db" stroke="#b8860b"/>
+        <text x="450" y="40" text-anchor="middle" font-family="monospace" font-size="10.5" fill="#7a5300">3</text>
+        <text x="600" y="40" font-size="10.5" fill="#334155">individual elements</text>
+
+        <text x="600" y="120" font-size="10.5" fill="#334155">individual arguments</text>
+        <rect x="280" y="105" width="60" height="30" rx="5" fill="#fff9db" stroke="#b8860b"/>
+        <text x="310" y="125" text-anchor="middle" font-family="monospace" font-size="10.5" fill="#7a5300">1</text>
+        <rect x="350" y="105" width="60" height="30" rx="5" fill="#fff9db" stroke="#b8860b"/>
+        <text x="380" y="125" text-anchor="middle" font-family="monospace" font-size="10.5" fill="#7a5300">2</text>
+        <rect x="420" y="105" width="60" height="30" rx="5" fill="#fff9db" stroke="#b8860b"/>
+        <text x="450" y="125" text-anchor="middle" font-family="monospace" font-size="10.5" fill="#7a5300">3</text>
+        <text x="200" y="125" font-size="11" fill="#334155">←...rest</text>
+        <rect x="20" y="95" width="150" height="40" rx="6" fill="#eef4ff" stroke="#2563eb" stroke-width="1.6"/>
+        <text x="95" y="120" text-anchor="middle" font-family="monospace" font-size="10.5" fill="#1a2b4c">[1, 2, 3]</text>
+      </svg>
+      <div class="caption">Fig. 7 — Spread (top) unpacks a collection outward; rest (bottom) gathers loose items back into one array — opposite directions, same <code>...</code> syntax.</div>
+    </div>
+<pre><code class="language-javascript">// Spread — expand
+const a = [1, 2, 3];
+const b = [...a, 4, 5];          // [1, 2, 3, 4, 5] — non-mutating copy + extend
+const merged = { ...user, age: 31 }; // shallow-copy an object, override one field
+console.log(Math.max(...a));      // spreads array into separate function arguments
+
+// Rest — collect
+function sum(...numbers) {        // numbers = [1, 2, 3, 4] however many are passed
+  return numbers.reduce((t, n) => t + n, 0);
+}
+sum(1, 2, 3, 4);                  // 10
+
+const [first, ...rest] = [1, 2, 3, 4]; // first = 1, rest = [2, 3, 4]</code></pre>
+  </section>
+
+  <h2 class="qhead">Quick Recap — JS Unit 1 Cheat Sheet</h2>
+  <section class="q">
+    <table>
+      <tr><th>Term</th><th>One-line meaning</th></tr>
+      <tr><td>Call stack</td><td>Where synchronous execution contexts are pushed/popped, LIFO</td></tr>
+      <tr><td>Event loop</td><td>Moves queued callbacks onto the call stack once it's empty</td></tr>
+      <tr><td>Hoisting</td><td>Declarations are registered in memory before code executes</td></tr>
+      <tr><td>Temporal Dead Zone</td><td>Window where a <code>let</code>/<code>const</code> exists but can't be accessed yet</td></tr>
+      <tr><td>Primitive vs. reference type</td><td>Copied by value vs. copied by pointer to shared heap data</td></tr>
+      <tr><td><code>==</code> vs <code>===</code></td><td>Coerces types vs. compares type + value strictly</td></tr>
+      <tr><td><code>??</code></td><td>Falls back only on <code>null</code>/<code>undefined</code>, unlike <code>||</code></td></tr>
+      <tr><td>Mutating array methods</td><td><code>push/pop/shift/unshift/splice</code> change the original</td></tr>
+      <tr><td>Arrow function <code>this</code></td><td>Lexical — inherited from the enclosing scope, never rebound</td></tr>
+      <tr><td>Spread <code>...</code></td><td>Expands a collection into individual elements</td></tr>
+      <tr><td>Rest <code>...</code></td><td>Collects individual items into one array</td></tr>
+    </table>
+  </section>
+
+  <div class="sources">
+    <b>Sources referenced</b>
+    <ol>
+      <li>[1] <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Execution_model" target="_blank">MDN — JavaScript execution model</a></li>
+      <li>[2] <a href="https://developer.mozilla.org/en-US/docs/Learn_web_development/Extensions/Async_JS/Introducing" target="_blank">MDN — Introducing asynchronous JavaScript</a></li>
+      <li>[3] <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/let" target="_blank">MDN — let, hoisting &amp; the Temporal Dead Zone</a></li>
+      <li>[4] <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures" target="_blank">MDN — JavaScript data types and data structures</a></li>
+    </ol>
+  </div>
+
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
+</body>
+</html>
