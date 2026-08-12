@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Module 1 — Software Testing &amp; Quality Assurance Fundamentals</title>
+<style>
+  body { max-width: 860px; margin: 0 auto; padding: 30px 20px 60px; font-family: system-ui, -apple-system, "Segoe UI", Arial, sans-serif; line-height: 1.6; color: #1a1a1a; }
+  a { color: #0645ad; }
+  a.home-link { display: inline-block; margin-bottom: 20px; font-size: 14px; }
+  h1, h2, h3, h4, h5, h6 { line-height: 1.3; }
+  pre { background: #f4f4f4; padding: 12px; overflow-x: auto; border: 1px solid #ddd; }
+  code { background: #f4f4f4; padding: 1px 4px; font-family: Consolas, "Courier New", monospace; }
+  pre code { background: none; padding: 0; }
+  table { border-collapse: collapse; width: 100%; margin: 12px 0; }
+  th, td { border: 1px solid #ccc; padding: 6px 10px; text-align: left; }
+  th { background: #f0f0f0; }
+  blockquote { border-left: 3px solid #ccc; margin: 10px 0; padding: 4px 14px; color: #444; }
+  hr { border: none; border-top: 1px solid #ddd; margin: 24px 0; }
+</style>
+</head>
+<body>
+<a class="home-link" href="index.html">&larr; Home</a>
+<h1 id="quality-revolution">Quality Revolution</h1>
+<p>The <strong>Quality Revolution</strong> began in Japan during the 1940s and 1950s, led by figures like W. Edwards Deming, Joseph M. Juran, and Kaoru Ishikawa. This movement shifted the focus of quality from end-of-cycle defect detection to <strong>continuous improvement across all phases</strong> of development, from requirements to final delivery. This revolution was rooted in <strong>Statistical Quality Control (SQC)</strong>, which uses data and metrics rather than intuition to make decisions. Key tools of SQC include Pareto analysis, cause-and-effect (Ishikawa) diagrams, flow charts, trend charts, histograms, scatter diagrams, and control charts. While the Deming Prize focuses on conformance to producer specifications, the later Malcolm Baldrige National Quality Award emphasizes quality as defined by the customer. See [[Software Testing]] for the condensed Inspection → QC → QA → TQM → Kaizen timeline of this same revolution.</p>
+<h3 id="software-quality">Software Quality</h3>
+<p><strong>Software quality</strong> is a complex, context-dependent concept that is perceived differently depending on the stakeholder. It is formally categorized into <strong>five views</strong>:</p>
+<ul>
+<li><strong>Transcendental View:</strong> Quality is recognized through experience but is difficult to define precisely.</li>
+<li><strong>User View:</strong> Quality is defined as "fitness for purpose," or how well the product meets user needs.</li>
+<li><strong>Manufacturing View:</strong> Quality is defined as "conformance to requirements" or specifications.</li>
+<li><strong>Product View:</strong> Quality is linked to internal product characteristics, such as modularity.</li>
+<li><strong>Value-Based View:</strong> Quality is measured by what a customer is willing to pay for it.</li>
+</ul>
+<p>To quantify quality, organizations use models like <strong>McCall's Quality Model</strong> (focused on 11 external factors like reliability and usability) and <strong>ISO 9126</strong> (standardizing six characteristics: functionality, reliability, usability, efficiency, maintainability, and portability).</p>
+<ul>
+<li><strong>Advantages:</strong> Provides a baseline for quality, allows for objective measurement of progress, and enables cost-benefit analysis of process improvements.</li>
+<li><strong>Disadvantages:</strong> Subjective metrics can be hard to combine into a single "quality score," and emphasizing one factor (like portability) may degrade another (like efficiency).</li>
+</ul>
+<h3 id="role-of-testing">Role of Testing</h3>
+<p><strong>Testing</strong> is a verification and validation process used to assess and improve software quality. It is broadly divided into <strong>Static Analysis</strong> (examining documents and code without execution) and <strong>Dynamic Analysis</strong> (actual program execution to expose failures).</p>
+<ul>
+<li><strong>Objectives:</strong> The primary goals are to demonstrate the system works, identify faults to fix them, reduce the risk of operational failure, and establish stakeholder confidence.</li>
+<li><strong>Agile Perspective:</strong> In Scrum and Lean environments, testing is not a separate phase but a <strong>continuous, cross-functional activity</strong> integrated into the entire development process to "build quality in".</li>
+<li><strong>Advantages:</strong> Uncovers defects early when they are cheapest to fix and serves as a principal measure of project progress.</li>
+<li><strong>Disadvantages:</strong> Testing can only show the <strong>presence of errors, never their absence</strong>. Exhaustive testing is mathematically impossible for most systems due to the massive size of input domains.</li>
+</ul>
+<h3 id="notion-of-software-reliability">Notion of Software Reliability</h3>
+<p><strong>Software reliability</strong> is defined as the <strong>probability of failure-free operation</strong> of a system for a specified time in a specified environment. Unlike hardware, which fails due to wear and tear, software fails due to <strong>design and implementation faults</strong> activated by specific input patterns. Reliability is often measured by <strong>failure intensity</strong>, which is the number of failures observed per unit of execution time.</p>
+<ul>
+<li><strong>Key Factors:</strong> Reliability is influenced by the size and complexity of code, the maturity of the development process, and the experience of the personnel.</li>
+<li><strong>Advantages:</strong> It provides an objective, statistical estimate of future system behavior and helps determine the optimal time to release a product based on failure rate targets.</li>
+<li><strong>Disadvantages:</strong> Reliability is highly dependent on the <strong>operational profile</strong>; a system that appears reliable to one user may be unreliable to another who uses different features.</li>
+</ul>
+<h3 id="diagram-references">Diagram References</h3>
+<ul>
+<li><strong>Shewhart (PDCA) Cycle:</strong> <em>Software Testing and Quality Assurance</em> (Wiley), Fig 1.1, p. 2.</li>
+<li><strong>Ishikawa (Cause-and-Effect) Diagram:</strong> <em>Software Testing and Quality Assurance</em> (Wiley), Fig 1.2, p. 4.</li>
+<li><strong>The V-Model:</strong> <em>Software Testing and Quality Assurance</em> (Wiley), Fig 1.7, p. 16.</li>
+<li><strong>McCall's Quality Model:</strong> <em>Software Quality Assurance</em> (Springer), Fig 2.2, p. 18.</li>
+<li><strong>ISO 9126 Model:</strong> <em>Software Quality Assurance</em> (Springer), Fig 2.4, p. 19.</li>
+<li><strong>Testing Quadrant Diagram:</strong> <em>Continuous Delivery</em> (Addison-Wesley), Fig 4.1, p. 85.</li>
+<li><strong>MTTR, MTTF, and MTBF Relationship:</strong> <em>Software Testing and Quality Assurance</em> (Wiley), Fig 15.1, p. 475.</li>
+</ul>
+<h2 id="statistical-quality-control-sqc"><strong>Statistical quality control (SQC)</strong></h2>
+<p><strong>Statistical quality control (SQC)</strong> is a discipline based on measurements and statistics where decisions and plans are developed through the collection and evaluation of actual data (metrics) rather than intuition or subjective experience. The field was pioneered by Walter Andrew Shewhart and further developed by W. Edwards Deming.</p>
+<h3 id="principles-of-statistical-quality-control">Principles of Statistical Quality Control</h3>
+<p>The fundamental principles of SQC, according to the sources, include:</p>
+<ul>
+<li><strong>Fact-Based Decision Making:</strong> All decisions must be based on data and metrics rather than intuition.</li>
+<li><strong>Consistency through Variability Reduction:</strong> The primary goal is to eliminate variability in a process. If a process is consistent, any problem that arises will have a specific, identifiable cause that can be eliminated.</li>
+<li><strong>Continuous Improvement:</strong> SQC relies on iterative feedback loops to refine processes, most famously embodied in the <strong>Plan-Do-Check-Act (PDCA) cycle</strong> (also called the Shewhart or Deming cycle).</li>
+<li><strong>Waste Elimination:</strong> Identifying and removing resources or process steps that add no value to the final product.</li>
+<li><strong>Customer Focus:</strong> Defining quality based on meeting or exceeding customer requirements and expectations.</li>
+</ul>
+<h3 id="tools-used-for-statistical-quality-control">Tools Used for Statistical Quality Control</h3>
+<p>SQC utilizes seven basic quality management tools:</p>
+<ol>
+<li><strong>Pareto Analysis/Diagram:</strong> Used to identify the "vital few" issues that cause the majority of problems (the 80/20 rule).</li>
+<li><strong>Cause-and-Effect Diagram:</strong> Also known as an <strong>Ishikawa</strong> or <strong>fishbone diagram</strong>, it is used to identify the root causes (Materials, Machines, Methods, and Measurements) of a quality effect.</li>
+<li><strong>Flow Chart:</strong> Visualizes the sequence of steps in a process.</li>
+<li><strong>Trend Chart:</strong> Tracks metrics over time to observe patterns.</li>
+<li><strong>Histogram:</strong> Displays the frequency distribution of data.</li>
+<li><strong>Scatter Diagram:</strong> Shows the relationship between two variables.</li>
+<li><strong>Control Chart:</strong> Monitors process stability.</li>
+</ol>
+<h3 id="principle-of-a-control-chart">Principle of a Control Chart</h3>
+<p>A <strong>control chart</strong> is a graphical tool used to monitor the performance of a process over time.</p>
+<ul>
+<li><strong>Principle of Stability:</strong> The chart is used to determine if a process is operating consistently. By plotting actual data points against a timeline, testers can observe if a process stays within expected bounds.</li>
+<li><strong>Identifying Causes of Deviation:</strong> When a metric falls outside the expected norm on the chart, it indicates a specific problem in the process that needs to be investigated and rectified, as opposed to random, inherent variation.</li>
+<li><strong>Statistical Foundation:</strong> While not detailed mechanically in these specific excerpts, standard control charts (outside information) use Upper and Lower Control Limits to define the range of "normal" variation.</li>
+</ul>
+<h3 id="definition-advantages-and-disadvantages">Definition, Advantages, and Disadvantages</h3>
+<ul>
+<li><strong>Definition:</strong> SQC is the application of statistical methods to monitor and improve the quality of a process or product by analyzing metrics to ensure conformance to requirements.</li>
+<li><strong>Advantages:</strong><ul>
+<li><strong>Predictability:</strong> It makes project performance (cost, schedule, quality) more predictable by establishing a quantitative baseline.</li>
+<li><strong>Efficiency:</strong> By identifying and eliminating waste and systemic errors, it reduces rework costs and improves productivity.</li>
+<li><strong>Transparency:</strong> It provides objective evidence of progress and quality to management and stakeholders.</li>
+</ul>
+</li>
+<li><strong>Disadvantages:</strong><ul>
+<li><strong>Complexity and Cost:</strong> Establishing a rigorous measurement program can be expensive and time-consuming.</li>
+<li><strong>Data Bias:</strong> Metrics can be "gamed" or misinterpreted if they are not carefully chosen to align with actual goals.</li>
+<li><strong>Rigidity:</strong> Over-standardization can sometimes stifle innovation or lead to resistance if the process becomes too bureaucratic.</li>
+</ul>
+</li>
+</ul>
+<h3 id="diagram-references-in-books">Diagram References in Books</h3>
+<ul>
+<li><strong>Walter Shewhart Portrait:</strong> <em>Software Quality Assurance</em> (Springer), Fig 2.1, p. 17.</li>
+<li><strong>Shewhart (PDCA) Cycle:</strong> <em>Software Testing and Quality Assurance</em> (Wiley), Fig 1.1, p. 2; <em>Software Quality Assurance</em> (Springer), Fig 3.2, p. 26.</li>
+<li><strong>Ishikawa (Cause-and-Effect) Diagram:</strong> <em>Software Testing and Quality Assurance</em> (Wiley), Fig 1.2, p. 4; Fig 13.5, p. 434.</li>
+<li><strong>Pareto Diagram:</strong> <em>Software Testing and Quality Assurance</em> (Wiley), Fig 13.4, p. 431.</li>
+</ul>
+<h1 id="lean-principle">Lean Principle</h1>
+<p><strong>Lean principles</strong> represent a systematic approach to identifying and <strong>eliminating waste</strong> through continuous improvement, focusing on flowing a product at the "pull" of the customer in pursuit of perfection. Originally developed in the Japanese automobile industry (specifically by Taiichi Ohno at Toyota) between 1950 and 1970, these principles aim to compress the time between a customer's order and the final payment by minimizing the consumption of resources that add no value to the product.</p>
+<h3 id="core-principles-of-lean">Core Principles of Lean</h3>
+<p>When translated to the domain of software development, lean principles are summarized by seven key tenets:</p>
+<ul>
+<li><strong>Eliminate Waste:</strong> Identifying and removing any resource or process step that does not add value to the final product.</li>
+<li><strong>Amplify Learning:</strong> Fostering an environment where the team continuously gains knowledge about the product and process.</li>
+<li><strong>Decide as Late as Possible:</strong> Deferring irreversible decisions until the last responsible moment when the most information is available.</li>
+<li><strong>Deliver as Fast as Possible:</strong> Reducing cycle time—the period from an initial idea to a usable product in the hands of a user.</li>
+<li><strong>Empower the Team:</strong> Shifting responsibility to the individuals actually doing the work and trusting them to solve problems.</li>
+<li><strong>Build Integrity:</strong> Ensuring the product is fit for purpose and maintains an appropriate level of quality throughout its lifecycle.</li>
+<li><strong>See the Whole:</strong> Optimizing the entire system and delivery process rather than making local improvements that may not benefit the end-to-end value stream.</li>
+</ul>
+<h3 id="key-concepts-and-tools">Key Concepts and Tools</h3>
+<ul>
+<li><strong>Waste (Muda):</strong> Lean philosophy identifies "waste" as any activity that consumes time or resources without adding value for the customer.</li>
+<li><strong>Pull System:</strong> In a lean environment, work is not "pushed" through a process; instead, it is "pulled" based on actual demand. For example, in a deployment pipeline, testers "pull" specific builds into testing environments when they are ready to evaluate them.</li>
+<li><strong>Kaizen (Continuous Improvement):</strong> Staff are encouraged to continuously look for areas where procedures can be refined to improve quality and efficiency.</li>
+<li><strong>Value Stream Mapping:</strong> A tool used to draw a chart of every step in a process from arrival to completion. By sketching out the time spent in both value-adding and non-value-adding (waiting) states, teams can identify and attack bottlenecks.</li>
+<li><strong>Jidoka:</strong> Developing techniques to capture and fix faults as close to their source as possible. In software, this is often achieved through practices like <strong>continuous integration</strong>, where every change triggers an automated feedback process.</li>
+</ul>
+<p>Lean principles have significantly influenced modern methodologies, including <strong>Continuous Delivery</strong> and <strong>Agile</strong> (such as Scrum), by emphasizing the delivery of high-quality, valuable software through iterative feedback loops and the continuous removal of waste.</p>
+<h1 id="ishiwaka-diagram">Ishiwaka Diagram</h1>
+<p>An <strong>Ishikawa diagram</strong>, also known as a <strong>cause-and-effect diagram</strong> or a <strong>fishbone diagram</strong>, is a graphical tool used to identify, organize, and visualize the potential causes of a specific quality problem or effect. It was developed by Kaoru Ishikawa, a pioneer of Total Quality Control in Japan, who found that variations in product quality typically stem from four common causes known as the <strong>4 Ms</strong>: Materials, Machines, Methods, and Measurements.</p>
+<h3 id="what-is-an-ishikawa-diagram">What is an Ishikawa Diagram?</h3>
+<p>The diagram consists of a bold horizontal arrow pointing toward the "effect" (the quality issue being analyzed), with diagonal arrows representing the probable "causes". These causes are traditionally categorized to help teams focus their attention on specific improvement areas. In software development, these categories are often adapted to include <strong>Tools, Input, Methods, and People</strong>.</p>
+<h3 id="when-should-the-ishikawa-diagram-be-used">When Should the Ishikawa Diagram Be Used?</h3>
+<p>The Ishikawa diagram is primarily used during <strong>Defect Causal Analysis (DCA)</strong> and <strong>Root Cause Analysis (RCA)</strong>. Specific situations include:</p>
+<ul>
+<li><strong>Identifying Systematic Errors:</strong> When a cluster of similar errors occurs frequently, the diagram helps teams move beyond addressing symptoms to identifying the underlying root cause.</li>
+<li><strong>Continuous Quality Improvement:</strong> It is a core tool in <strong>quality circle</strong> activities where volunteer groups meet to discuss and resolve problems.</li>
+<li><strong>Defect Prevention:</strong> To prevent similar errors from recurring by analyzing why they happened in the first place and implementing preventive or corrective actions.</li>
+<li><strong>Statistical Quality Control (SQC):</strong> As one of the seven basic quality management tools used to make fact-based decisions rather than relying on intuition.</li>
+</ul>
+<h3 id="procedure-to-construct-an-ishikawa-diagram">Procedure to Construct an Ishikawa Diagram</h3>
+<p>Drawing from the methodology of Defect Causal Analysis, the procedure for constructing an Ishikawa diagram follows these steps:</p>
+<ol>
+<li><strong>Define the Effect:</strong> Clearly state the specific problem or quality defect being analyzed at the head of the diagram.</li>
+<li><strong>Draw the Backbone:</strong> Draw a bold horizontal line (the "backbone") pointing to the problem statement.</li>
+<li><strong>Identify Generic Cause Categories:</strong> Draw diagonal lines (the "ribs") pointing to the backbone for major categories of potential causes.<ul>
+<li>For manufacturing, use the <strong>4 Ms</strong>: Materials, Machines, Methods, and Measurements.</li>
+<li>For software, consider: <strong>Tools, Input, Methods, and People</strong>.</li>
+</ul>
+</li>
+<li><strong>Brainstorm Specific Causes:</strong> Conduct a brainstorming session to identify detailed, specific causes and attach them as sub-branches to the appropriate generic cause categories.</li>
+<li><strong>Analyze the Results:</strong> Identify the principal causes by looking for the densest clusters of causes or factors that significantly contribute to the effect.</li>
+<li><strong>Develop an Action Plan:</strong> Once the root cause is isolated, create a plan for preventive, corrective, or mitigating actions to eliminate the source of the defect.</li>
+</ol>
+<h3 id="diagram-references-in-the-sources">Diagram References in the Sources</h3>
+<ul>
+<li><strong>Example Ishikawa Diagram:</strong> <em>Software Testing and Quality Assurance</em> (Wiley), Figure 1.2, p. 4.</li>
+<li><strong>Cause-Effect Diagram for DCA:</strong> <em>Software Testing and Quality Assurance</em> (Wiley), Figure 13.5, p. 434.</li>
+</ul>
+<h1 id="tqm-and-tqc">TQM and TQC</h1>
+<p><strong>Total Quality Management (TQM)</strong> is a management approach that aims for long-term success by linking quality directly to <strong>customer satisfaction</strong>. It is characterized as a company-wide quality culture where every member of the organization participates in continuous improvement. See also [[Software Testing]]'s "Quality Revolution" note (Inspection → QC → QA → TQM → Kaizen) for the timeline this evolved from.</p>
+<h3 id="principles-of-total-quality-management-tqm">Principles of Total Quality Management (TQM)</h3>
+<p>According to the sources, TQM is built upon four essential principles:</p>
+<ul>
+<li><strong>Customer Focus:</strong> The primary objective is to achieve total customer satisfaction by studying their wants and needs and managing their feedback.</li>
+<li><strong>Process Improvement:</strong> TQM focuses on reducing process variations and achieving continuous improvement in both business and product development processes.</li>
+<li><strong>Human Side of Quality:</strong> This involves creating a company-wide quality culture through leadership, management commitment, employee empowerment, and total participation.</li>
+<li><strong>Measurement and Analysis:</strong> Improvement is driven by a goal-oriented measurement system that tracks all quality parameters.</li>
+</ul>
+<h3 id="what-is-total-quality-control-tqc">What is Total Quality Control (TQC)?</h3>
+<p><strong>Total Quality Control (TQC)</strong> was a term coined by Armand V. Feigenbaum in 1951. It represented a move to raise quality management from individual manufacturing units to the <strong>entire organization</strong>. Key elements of TQC management include putting quality first over short-term profits, making decisions based on facts and data, and utilizing cross-functional committees for product planning, design, and manufacturing.</p>
+<h3 id="differences-between-tqm-and-tqc">Differences Between TQM and TQC</h3>
+<p>While TQM and TQC share many similarities—such as being company-wide initiatives that prioritize the customer—the sources highlight several key distinctions:</p>
+<ul>
+<li><strong>Definition of Quality:</strong> In the context of TQC (often associated with the Deming Prize), quality is viewed as being <strong>defined by the producers</strong> through strict <strong>conformance to specifications</strong>. In TQM (often associated with the Malcolm Baldrige National Quality Award), quality is viewed as being <strong>defined by the customer</strong>.</li>
+<li><strong>Evolutionary Focus:</strong> TQC originated as a method to expand <strong>statistical quality control (SQC)</strong> into company-wide activities, education, and quality circles. TQM evolved later (particularly gaining prominence in the 1980s in the US and Europe) as a more holistic management framework designed to compete with the Japanese "economic miracle" by integrating quality into the very fabric of business management.</li>
+<li><strong>Human Resources &amp; Culture:</strong> TQM places a heavy emphasis on the <strong>"human side" of quality</strong>, explicitly focusing on employee empowerment and leadership as strategic pillars to drive long-term success. While TQC involves participatory management, TQM is more specifically a "people-centric" approach compared to the more "process-centric" traditional models.</li>
+<li><strong>Outcome:</strong> TQM is often the driver behind modern software process improvement models like <strong>CMMI</strong>, using customer-focused value to prevent processes from becoming purely bureaucratic.</li>
+</ul>
+<h1 id="verification-and-validation">Verification and Validation</h1>
+<p>In software quality assurance, <strong>verification</strong> and <strong>validation</strong> are distinct yet complementary processes that ensure a product's quality through different lenses and at different stages of development.</p>
+<h3 id="definitions-and-primary-objectives">Definitions and Primary Objectives</h3>
+<p>The fundamental difference between the two is often summarized by the following distinction:</p>
+<ul>
+<li><strong>Verification:</strong> Aims to confirm that you are <strong>"building the product correctly"</strong>. It is the process of evaluating a software system to determine whether the products of a given development phase satisfy the requirements established at the start of that phase.</li>
+<li><strong>Validation:</strong> Aims to confirm that you are <strong>"building the correct product"</strong>. It consists of activities designed to confirm that the final product meets its intended use and satisfies the actual needs and expectations of the customer.</li>
+</ul>
+<h3 id="scope-and-timing">Scope and Timing</h3>
+<ul>
+<li><strong>Verification</strong> focuses on <strong>interim work products</strong>, such as requirements specifications, design documents, source code, and user manuals. These activities occur during the project lifecycle to ensure consistency, completeness, and correctness at each major stage of development.</li>
+<li><strong>Validation</strong> typically focuses on the <strong>final product</strong> toward the end of system development. However, the sources note that late execution of validation is risky and can lead to high development costs. Consequently, modern methodologies like eXtreme Programming (XP) integrate validation early by conducting acceptance tests during every development iteration.</li>
+</ul>
+<h3 id="methods-of-execution">Methods of Execution</h3>
+<ul>
+<li><strong>Verification</strong> predominantly employs <strong>static analysis</strong> techniques, such as inspections, walkthroughs, reviews, and the use of checklists or standards. It may also include dynamic analysis, such as actual program execution, to check the correctness of a specific development phase.</li>
+<li><strong>Validation</strong> is performed by <strong>actually running the system</strong> in its real environment using a variety of tests to determine if the entire system meets customer needs. While verification establishes the correspondence between a phase and its specification, validation establishes the correspondence between the system and the user's expectations.</li>
+</ul>
+<h3 id="summary-of-differences">Summary of Differences</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Feature</th>
+<th style="text-align: left;">Verification</th>
+<th style="text-align: left;">Validation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Question</strong></td>
+<td style="text-align: left;">Are we building the product correctly?</td>
+<td style="text-align: left;">Are we building the correct product?</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Focus</strong></td>
+<td style="text-align: left;">Specifications and interim products</td>
+<td style="text-align: left;">Customer needs and the final product</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Methods</strong></td>
+<td style="text-align: left;">Mostly static analysis (reviews, inspections)</td>
+<td style="text-align: left;">Mostly dynamic analysis (executing the system)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Goal</strong></td>
+<td style="text-align: left;">Consistency, completeness, and correctness</td>
+<td style="text-align: left;">Conformance to intended use</td>
+</tr>
+<tr>
+<td style="text-align: left;"># Difference between Failure, Error, Fault</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">In software testing and quality assurance, the terms <strong>failure</strong>, <strong>error</strong>, and <strong>fault</strong> represent different stages of a "behavior chain" that leads to a system malfunction.</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+</tbody>
+</table>
+<h3 id="1-fault">1. Fault</h3>
+<p>A <strong>fault</strong> (often used interchangeably with <strong>defect</strong>) is the underlying cause of an error. It is a flaw in the software, such as an incorrect piece of code or a missing instruction, introduced during the development process. A fault can remain dormant in the system for a long time until a specific event or input activates it.</p>
+<ul>
+<li><strong>Types:</strong> Faults are generally categorized as logic, requirement, design, or construction faults.</li>
+</ul>
+<h3 id="2-error">2. Error</h3>
+<p>An <strong>error</strong> is an intermediate, unstable state of the system caused by the activation of a fault. It is an internal discrepancy—such as an incorrect variable value or an undefined data state—that exists before it manifests as something observable to the user.</p>
+<ul>
+<li><strong>Correction:</strong> In fault-tolerant computing, corrective actions can be taken to move a program out of an error state into a desirable state to prevent it from ever becoming a failure.</li>
+</ul>
+<h3 id="3-failure">3. Failure</h3>
+<p>A <strong>failure</strong> is the manifested inability of a program to perform its required function. It occurs when the external, observable behavior of the system does not conform to the prescribed specification. Failures are evidenced by incorrect outputs, abnormal termination, or unmet time constraints.</p>
+<ul>
+<li><strong>Perspective:</strong> In the modern software business, failure means the customer's expectations have not been met or the user is unable to perform useful work with the product.</li>
+</ul>
+<h3 id="the-relationship-the-behavior-chain">The Relationship: The Behavior Chain</h3>
+<p>The process of a defect becoming visible follows this sequence: <strong>Fault (\rightarrow) Error (\rightarrow) Failure</strong>. A fault must be executed, it must then "infect" the data state to create an error, and that error must finally "propagate" to an output variable to be observed as a failure.</p>
+<h3 id="real-world-examples-and-use-cases">Real-World Examples and Use Cases</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Concept</th>
+<th style="text-align: left;">Software Calculation Example</th>
+<th style="text-align: left;">Mission-Critical Use Case (NORAD)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Fault</strong></td>
+<td style="text-align: left;">A programmer writes <code>sum = value[i]</code> instead of <code>sum = sum + value[i]</code>.</td>
+<td style="text-align: left;">A computer communications chip fails.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Error</strong></td>
+<td style="text-align: left;">When executed, the internal variable <code>sum</code> holds only the last value rather than the running total.</td>
+<td style="text-align: left;">The system starts filling in random numbers for the "missiles detected" field.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Failure</strong></td>
+<td style="text-align: left;">The final average printed on the screen is mathematically incorrect, alerting the user.</td>
+<td style="text-align: left;">The system provides a false indication of a mass nuclear raid to military personnel.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Use Case: Organization Staff Promotion</strong> Imagine a small organization with a <strong>defective</strong> staff promotion policy (<strong>Fault</strong>). If that policy is executed, it leads to improper promotions, which creates an <strong>error</strong> in the organization's internal state. Eventually, departments begin to malfunction due to these improper placements, causing a total degradation of performance—the organization's <strong>failure</strong> to achieve its goals.</p>
+<h1 id="test-case-wrt-testing">Test Case wrt testing</h1>
+<p>In its most basic form, a <strong>test case</strong> is a pair consisting of an <strong>input and an expected outcome</strong>. In state-oriented systems, where the outcome depends on both the current state and the current input, a test case may consist of a <strong>sequence</strong> of these &lt;input, expected outcome&gt; pairs. Practically, test cases represent the actual executions of a system under test (SUT).</p>
+<p>Every test case must be associated with a clear <strong>test objective</strong> or purpose. It is considered meaningful only if there is a way to decide if the results produced by the program are acceptable, typically using a mechanism known as a <strong>test oracle</strong>. For concrete test case field formats and worked case studies, see [[Static Testing]] and [[Software Testing]].</p>
+<h3 id="objectives-of-testing">Objectives of Testing</h3>
+<p>Testing is a critical part of quality assurance with several key objectives that vary depending on the stakeholder's perspective:</p>
+<ul>
+<li><strong>Demonstrate that the system works:</strong> From a programmer's or developer's viewpoint, the goal is often to show that the system performs its basic functions under normal circumstances.</li>
+<li><strong>Identify failures and faults:</strong> Once basic functionality is confirmed, testing shifts to an adversarial goal—trying to make the system fail to uncover resident faults.</li>
+<li><strong>Reduce the risk of failure:</strong> As faults are discovered and fixed, the failure rate of a system decreases, bringing the risk of operational failure down to an acceptable level.</li>
+<li><strong>Verify requirements and acceptance:</strong> Testing establishes whether an implementation conforms to specified customer requirements and is fit for its intended purpose.</li>
+<li><strong>Reduce testing costs:</strong> A high-level objective is to produce low-risk software using the fewest number of effective test cases possible to minimize expenses related to design, execution, and analysis.</li>
+<li><strong>Establish confidence:</strong> Testing provides an objective assessment of software quality, giving stakeholders confidence that the product is of value and fit for use.</li>
+</ul>
+<h1 id="concepts-of-types-of-testing">Concepts of types of testing</h1>
+<p>Software testing is traditionally organized into a hierarchy of levels, often visualized through the <strong>V-Model</strong>, which maps development phases to corresponding testing stages. For the concrete phase-by-phase V-model breakdown, see [[Static Testing]].</p>
+<h3 id="1-unit-testing">1. Unit Testing</h3>
+<p><strong>Unit testing</strong> involves testing individual program units (such as functions, procedures, methods, or classes) in isolation.</p>
+<ul>
+<li><strong>Purpose:</strong> To verify that each unit works correctly and produces expected results before being integrated with others.</li>
+<li><strong>Performer:</strong> Usually conducted by the <strong>programmer</strong> who wrote the code, as they are intimately familiar with its internal logic.</li>
+<li><strong>Characteristics:</strong> These tests should run very fast and ideally do not touch the database, network, or filesystem.</li>
+<li><strong>Methods:</strong> Includes <strong>Static analysis</strong> (code reviews, inspections) and <strong>Dynamic analysis</strong> (actual execution using "drivers" to call the unit and "stubs" to simulate called modules).</li>
+<li><strong>Diagram Reference:</strong> Figure 1.7, p. 16 (V-Model, development and testing phases); Dynamic Unit Test Environment (Drivers &amp; Stubs), Figure 3.2, p. 63.</li>
+</ul>
+<h3 id="2-integration-testing">2. Integration Testing</h3>
+<p><strong>Integration testing</strong> is the process of assembling unit-tested modules to construct larger subsystems or the full system.</p>
+<ul>
+<li><strong>Purpose:</strong> To identify and resolve <strong>interface errors</strong> where modules fail to communicate or pass data correctly.</li>
+<li><strong>Techniques:</strong> Common strategies include <strong>Top-down</strong> (starting from the main module), <strong>Bottom-up</strong> (starting from terminal modules), <strong>Sandwich</strong> (a mix of both), and <strong>Incremental</strong> (building and testing in small successive "builds").</li>
+<li><strong>Diagram Reference:</strong> Figures 7.1–7.10, pp. 168–172 (illustrating top-down and bottom-up methods) — Top-Down Module Integration: Figures 7.2–7.7, pp. 169–170; Bottom-Up Module Integration: Figures 7.8–7.10, pp. 171–172.</li>
+</ul>
+<h3 id="3-system-testing">3. System Testing</h3>
+<p><strong>System testing</strong> evaluates the completely integrated system to ensure it meets all functional and non-functional requirements.</p>
+<ul>
+<li><strong>Purpose:</strong> To validate the product's behavior in an environment similar to production.</li>
+<li><strong>Categories:</strong> It covers a broad spectrum, including <strong>functionality, security, performance, stress, scalability, and load testing</strong>.</li>
+<li><strong>Performer:</strong> Typically conducted by an <strong>independent system test group</strong> to ensure an unbiased evaluation.</li>
+<li><strong>Diagram Reference:</strong> Figure 8.1, p. 193 (Taxonomy of system tests).</li>
+</ul>
+<h3 id="4-acceptance-testing">4. Acceptance Testing</h3>
+<p><strong>Acceptance testing</strong> is formal testing conducted to determine if a system satisfies its <strong>acceptance criteria</strong> so that the customer can decide whether to accept the product.</p>
+<ul>
+<li><strong>Purpose:</strong> To confirm the system is "building the correct product" and is fit for its intended use.</li>
+<li><strong>Types:</strong><ul>
+<li><strong>User Acceptance Testing (UAT):</strong> Conducted by the customer in their real-world environment.</li>
+<li><strong>Business Acceptance Testing (BAT):</strong> A rehearsal performed within the developer's organization to ensure the system is ready for the actual UAT.</li>
+</ul>
+</li>
+<li><strong>Criteria:</strong> In agile (Scrum) environments, acceptance criteria are often defined through <strong>User Stories</strong> and <strong>Conditions of Satisfaction</strong>. See also [[Software Testing]] for the SDLC-stage framing of this level (Stage 5).</li>
+</ul>
+<h3 id="5-regression-testing">5. Regression Testing</h3>
+<p><strong>Regression testing</strong> is the selective retesting of a system that has been modified to ensure that no new defects have been introduced into the unchanged portions.</p>
+<ul>
+<li><strong>Purpose:</strong> To guard against "side effects" or "collateral damage" caused by bug fixes or new feature implementations.</li>
+<li><strong>Context:</strong> It is not a distinct level but is performed at <strong>all levels</strong> of testing (unit, integration, and system).</li>
+<li><strong>Automation:</strong> Because regression tests must be run frequently (e.g., as part of <strong>Continuous Integration</strong>), they are primary candidates for automation to save time and reduce costs.</li>
+<li><strong>Diagram Reference:</strong> Figure 1.8, p. 17 (Regression Testing at Different Levels).</li>
+</ul>
+<h3 id="summary-of-differences_1">Summary of Differences</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Feature</th>
+<th style="text-align: left;">Unit</th>
+<th style="text-align: left;">Integration</th>
+<th style="text-align: left;">System</th>
+<th style="text-align: left;">Acceptance</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Scope</strong></td>
+<td style="text-align: left;">Individual modules</td>
+<td style="text-align: left;">Combined modules</td>
+<td style="text-align: left;">Complete system</td>
+<td style="text-align: left;">User needs/Contract</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Focus</strong></td>
+<td style="text-align: left;">Internal logic</td>
+<td style="text-align: left;">Interfaces</td>
+<td style="text-align: left;">Requirements</td>
+<td style="text-align: left;">Fitness for use</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Performer</strong></td>
+<td style="text-align: left;">Developer</td>
+<td style="text-align: left;">Developer/Integrator</td>
+<td style="text-align: left;">Independent Tester</td>
+<td style="text-align: left;">Customer/User</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Philosophy</strong></td>
+<td style="text-align: left;">Building it <em>correctly</em></td>
+<td style="text-align: left;">Interaction integrity</td>
+<td style="text-align: left;">Total system behavior</td>
+<td style="text-align: left;">Building the <em>correct</em> thing</td>
+</tr>
+<tr>
+<td style="text-align: left;"># Sources for test case selection</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+</tbody>
+</table>
+<p>In software testing, test cases are generated and selected by analyzing various sources of information produced during the development process. The following are the five primary sources for test case selection:</p>
+<h3 id="1-requirements-and-functional-specifications">1. Requirements and Functional Specifications</h3>
+<p>The process of capturing user needs is the starting point for test design. These specifications can take two forms:</p>
+<ul>
+<li><strong>Informal Specifications:</strong> These include plaintext descriptions, equations, figures, and flowcharts. For example, the Bluetooth specification consists of over 1,100 pages of such informal descriptions.</li>
+<li><strong>Formal Specifications:</strong> These are written in formal notations or languages such as <strong>Z, SDL, Estelle, or finite-state machines</strong>. Both formal and informal specifications are considered prime sources for test cases.</li>
+</ul>
+<h3 id="2-source-code">2. Source Code</h3>
+<p>While requirements describe <em>intended</em> behavior, the <strong>source code</strong> describes the <em>actual</em> behavior and implementation details. Test cases derived from the source code (white-box testing) allow programmers to test concrete logic, such as specific sorting algorithms or high-level assumptions that take a concrete form during coding.</p>
+<h3 id="3-input-and-output-domains">3. Input and Output Domains</h3>
+<p>Test cases must account for the specific characteristics of data domains.</p>
+<ul>
+<li><strong>Special Values:</strong> Certain values in the integer domain, such as <strong>0 and 1</strong>, have special characteristics (e.g., (0 \times x = 0)) and must be treated separately.</li>
+<li><strong>Boundaries:</strong> Errors often occur at the edges of valid input ranges. Analysis of these domains helps in selecting "boundary values" that are more likely to reveal defects than values in the center of a range.</li>
+<li><strong>Diagram Reference:</strong> Subset of Input Domain vs. Program Behavior, Figure 1.5, p. 14.</li>
+</ul>
+<h3 id="4-operational-profile">4. Operational Profile</h3>
+<p>An operational profile is a <strong>quantitative characterization</strong> of how the system will be used in the real world. It guides engineers in selecting test cases that resemble future usage patterns to accurately estimate the software's future reliability. For web applications, this data is often collected from web server user session data.</p>
+<h3 id="5-fault-model">5. Fault Model</h3>
+<p>Information about <strong>previously encountered faults</strong> is an excellent source for designing new tests. Faults are categorized into classes (e.g., initialization, logic, or interface faults) and stored in repositories. There are three main types of fault-based testing used to select cases:</p>
+<ul>
+<li><strong>Error Guessing:</strong> Testers use their experience to guess where faults might exist and design tests to expose them.</li>
+<li><strong>Fault Seeding:</strong> Intentional injection of known faults into a program to assess the effectiveness of a test suite.</li>
+<li><strong>Mutation Analysis:</strong> Creating "mutants" by making small syntactic changes to the code to determine if the test suite is capable of detecting the resulting errors.</li>
+</ul>
+<h1 id="testing-process-planning-and-management">Testing Process, Planning, and Management</h1>
+<h3 id="1-concept-of-complete-testing">1. Concept of Complete Testing</h3>
+<ul>
+<li><strong>Definition:</strong> <strong>Complete (or exhaustive) testing</strong> is a state where all problems are known at the end of a test phase and there are no undiscovered faults.</li>
+<li><strong>Feasibility:</strong> In practice, complete testing is <strong>near impossible</strong> for most non-trivial systems.</li>
+<li><strong>Barriers to Completeness:</strong><ul>
+<li><strong>Large Input Domains:</strong> The number of possible inputs (valid, invalid, and timed) is too vast for exhaustive use.</li>
+<li><strong>Complex Design:</strong> Implicit assumptions, global variables, and complex logic paths are difficult to test fully.</li>
+<li><strong>Environmental Factors:</strong> Behavior may depend on unpredictable real-world variables like weather or temperature.</li>
+</ul>
+</li>
+<li><strong>Advantages:</strong> It provides an absolute guarantee of correctness.</li>
+<li><strong>Disadvantages:</strong> It is economically and technically impractical.</li>
+<li><strong>Diagram Reference:</strong> <em>Software Testing and Quality Assurance</em> (Naik/Tripathy), Figure 1.5, p. 14 (Subset of Input Domain vs. Program Behavior).</li>
+</ul>
+<h3 id="2-central-issue-in-testing">2. Central Issue in Testing</h3>
+<ul>
+<li><strong>The Problem:</strong> Since complete testing is impossible, the <strong>central issue</strong> is the systematic and careful <strong>selection of a subset</strong> of the input domain ((D_1)) to deduce the properties of the entire program ((P)).</li>
+<li><strong>Goal:</strong> Selection must be done accurately to reach reliable conclusions about the quality of the entire system.</li>
+<li><strong>Key Strategies:</strong> Test engineers must use <strong>coverage criteria</strong> (e.g., statement or branch coverage) to ensure the selected subset is representative and effective.</li>
+</ul>
+<h3 id="3-testing-activities">3. Testing Activities</h3>
+<p>Testing involves a structured sequence of actions focused on individual test cases.</p>
+<ol>
+<li><strong>Identify Objective:</strong> Define the specific purpose or intent of the test.</li>
+<li><strong>Select Inputs:</strong> Choose data based on requirements, code, or user expectations.</li>
+<li><strong>Compute Expected Outcome:</strong> Use a <strong>test oracle</strong> (human or tool) to determine what the correct result should be.</li>
+<li><strong>Set up Environment:</strong> Prepare the hardware, network, and external systems to satisfy all test assumptions.</li>
+<li><strong>Execute Program:</strong> Provide inputs and observe the actual outcome.</li>
+<li><strong>Analyze Result:</strong> Compare the actual outcome against the expected one and assign a <strong>test verdict</strong>.<ul>
+<li><strong>Pass:</strong> Output matches expectations.</li>
+<li><strong>Fail:</strong> Output does not match expectations.</li>
+<li><strong>Inconclusive:</strong> Result is unclear, often due to environmental timeouts.</li>
+</ul>
+</li>
+</ol>
+<ul>
+<li><strong>Diagram Reference:</strong> <em>Software Testing and Quality Assurance</em> (Wiley), Figure 1.6, p. 14 (Activities in Program Testing).</li>
+</ul>
+<h3 id="4-test-planning-and-design">4. Test Planning and Design</h3>
+<ul>
+<li><strong>Test Planning:</strong> Provides the <strong>framework and scope</strong> for the project, detailing resources, effort, schedule, and budget.<ul>
+<li><strong>Advantages:</strong> Establishes management support, ensures coverage via a traceability matrix, and provides an orderly schedule.</li>
+<li><strong>Structure:</strong> Includes introduction, assumptions, environment needs, and execution strategy.</li>
+</ul>
+</li>
+<li><strong>Test Design:</strong> A critical phase where requirements are studied to define specific test objectives and multistep procedures.<ul>
+<li><strong>Test Case Life Cycle:</strong> Follows a path from <strong>Create (\rightarrow) Draft (\rightarrow) Review (\rightarrow) Released (\rightarrow) Update (\rightarrow) Deprecated</strong>.</li>
+</ul>
+</li>
+<li><strong>Diagram References:</strong><ul>
+<li><em>Software Testing and Quality Assurance</em> (Wiley), Figure 11.1, p. 323 (Requirement State Transition).</li>
+<li><em>Software Testing and Quality Assurance</em> (Wiley), Figure 11.6, p. 345 (Test Case Life Cycle).</li>
+</ul>
+</li>
+</ul>
+<h3 id="5-monitoring-and-measuring-test-execution">5. Monitoring and Measuring Test Execution</h3>
+<p>Organizations monitor metrics to quantify progress and system quality.</p>
+<ul>
+<li><strong>Test Execution Metrics:</strong><ul>
+<li><strong>PAE (Planned vs. Actual Execution):</strong> Compares how many tests were run against the initial plan to gauge productivity.</li>
+<li><strong>EST (Execution Status of Test):</strong> Monitors how many tests are currently passed, failed, blocked, invalid, or untested.</li>
+</ul>
+</li>
+<li><strong>Defect Metrics:</strong><ul>
+<li><strong>DAR (Defect Arrival Rate):</strong> Tracks how quickly new bugs are found.</li>
+<li><strong>Outstanding Defects:</strong> Reflects the current quality level of the system.</li>
+</ul>
+</li>
+<li><strong>Diagram Reference:</strong> <em>Software Testing and Quality Assurance</em> (Wiley), Figure 13.2, p. 417 (Projected vs. Actual Execution Chart).</li>
+</ul>
+<h3 id="6-test-tools-and-automation">6. Test Tools and Automation</h3>
+<ul>
+<li><strong>Test Tools:</strong> Range from <strong>code auditors</strong> and <strong>memory leak detectors</strong> to <strong>simulators</strong> and <strong>traffic generators</strong>.</li>
+<li><strong>Automation Strategy:</strong> Successful teams utilize the <strong>Test Automation Pyramid</strong> (see full breakdown under [[#Strengths and Weakness of Automated and Manual Testing]]):<ul>
+<li><strong>Base:</strong> Massive amount of fast <strong>unit tests</strong>.</li>
+<li><strong>Middle:</strong> <strong>Service-layer tests</strong> that bypass the UI to reduce brittleness.</li>
+<li><strong>Top:</strong> Minimal number of <strong>UI tests</strong> for end-to-end checks.</li>
+</ul>
+</li>
+<li><strong>Advantages:</strong> Increased productivity, better regression coverage, and reduced long-term maintenance costs.</li>
+<li><strong>Disadvantages:</strong> High initial investment, maintenance of brittle scripts (especially UI), and lack of human creativity.</li>
+<li><strong>Diagram Reference:</strong> <em>Succeeding with Agile</em> / <em>Continuous Delivery</em>, Figure 7.3, p. 178 (Test Automation Pyramid).</li>
+</ul>
+<h3 id="7-test-team-organization-and-management">7. Test Team Organization and Management</h3>
+<ul>
+<li><strong>Organization Structure:</strong><ul>
+<li><strong>Integration Test Group:</strong> Composed of developers/architects familiar with system internals.</li>
+<li><strong>Independent System Test Group:</strong> Separate from developers to ensure <strong>unbiased evaluation</strong>.</li>
+</ul>
+</li>
+<li><strong>Team Hierarchy:</strong> Typically includes <strong>Manager (\rightarrow) Technical Leader (\rightarrow) Principal Engineer (\rightarrow) Senior Engineer (\rightarrow) Junior Engineer</strong>.</li>
+<li><strong>Staffing (The 5 C's):</strong> Ideal testers are <strong>Controlled, Comprehensive, Considerate, Critical, and Competent</strong>.</li>
+<li><strong>Management Philosophy:</strong> Quality is increasingly viewed as a <strong>whole-team responsibility</strong> where everyone (testers, developers, product owners) is accountable for the final product.</li>
+<li><strong>Diagram Reference:</strong> <em>Software Testing and Quality Assurance</em> (Wiley), Figure 16.1, p. 498 (Structure of Test Groups).</li>
+</ul>
+<h1 id="structural-vs-functional-testing">Structural vs Functional Testing</h1>
+<p><strong>Structural testing</strong> (also known as <strong>white-box testing</strong>) and <strong>functional testing</strong> (also known as <strong>black-box testing</strong>) are the two primary methodologies used to design and evaluate test cases, differing fundamentally in their information sources, goals, and who typically performs them. See [[Manual Testing]] for the third variant (Grey Box Testing) and [[Software Testing]] for white-box case-study formats and a worked black-box example.</p>
+<h3 id="core-definitions">Core Definitions</h3>
+<ul>
+<li><strong>Structural Testing:</strong> Focuses on the <strong>internal mechanisms</strong> of a software system, such as its source code, logic, control flow, and data flow. It aims to ensure that the "product is being built correctly" (verification) by examining how the code actually executes.</li>
+<li><strong>Functional Testing:</strong> Treats the system as a "black box," ignoring its internal code and focusing solely on <strong>inputs, outputs, and specified requirements</strong>. It aims to ensure that the "correct product is being built" (validation) by verifying that it delivers the value expected by the user.</li>
+</ul>
+<h3 id="key-differences">Key Differences</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Feature</th>
+<th style="text-align: left;">Structural Testing (White-Box)</th>
+<th style="text-align: left;">Functional Testing (Black-Box)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Information Source</strong></td>
+<td style="text-align: left;">The <strong>source code</strong> itself and its internal logic.</td>
+<td style="text-align: left;"><strong>Requirements</strong>, functional specifications, and user needs.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Primary Goal</strong></td>
+<td style="text-align: left;">To exercise specific code paths, statements, and logic branches.</td>
+<td style="text-align: left;">To verify that system behavior conforms to specifications and user expectations.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Performer</strong></td>
+<td style="text-align: left;">Usually the <strong>individual programmer</strong> who knows the code's internal details.</td>
+<td style="text-align: left;">Usually an <strong>independent quality assurance group</strong> or the end customer.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Level of Testing</strong></td>
+<td style="text-align: left;">Primarily used during <strong>unit testing</strong> of individual program units.</td>
+<td style="text-align: left;">Applied at all levels, particularly <strong>system and acceptance testing</strong>.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Key Limitation</strong></td>
+<td style="text-align: left;">Cannot detect <strong>missing paths</strong> or functions if they were never coded.</td>
+<td style="text-align: left;">Cannot identify <strong>hidden faults</strong> buried deep in system internals.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="techniques-and-metrics">Techniques and Metrics</h3>
+<ul>
+<li><strong>Structural Metrics:</strong> Test adequacy is measured through <strong>coverage metrics</strong> such as statement coverage, branch coverage, path coverage, and data flow coverage (e.g., all-defs or all-uses). Tools like <strong>Control Flow Graphs (CFG)</strong> are often used to identify these paths.</li>
+<li><strong>Functional Techniques:</strong> Test cases are selected using techniques such as <strong>Equivalence Class Partitioning</strong>, <strong>Boundary Value Analysis</strong>, <strong>Decision Tables</strong>, and <strong>State Machine Models</strong>. Success is measured by the percentage of requirements or features successfully verified.</li>
+<li><strong>Diagram Reference:</strong> Symbols in a Control Flow Graph (CFG), Figure 4.2, p. 91; Data Flow Graph (DFG), Figure 5.4, p. 118; Relationship Among Data Flow (DF) Testing Criteria, Figure 5.5, p. 125; ON and OFF Points in Domain Testing, Figure 6.6, p. 146.</li>
+</ul>
+<h3 id="complementary-nature">Complementary Nature</h3>
+<p>The sources emphasize that <strong>neither methodology is sufficient by itself</strong>. For example, 100% code coverage does not guarantee a bug-free program, as it might not expose logic errors that only occur with specific data combinations. Conversely, black-box testing might miss obscure code paths that are not easily triggered by high-level user requirements. Therefore, a combination of both structural and functional techniques is required for effective program testing.</p>
+<h1 id="strengths-and-weakness-of-automated-and-manual-testing">Strengths and Weakness of Automated and Manual Testing</h1>
+<p>Based on the sources, both automated and manual testing have distinct roles, with the effectiveness of a testing strategy often depending on how these two approaches are balanced.</p>
+<h3 id="automated-testing"><strong>Automated Testing</strong></h3>
+<p><strong>Strengths</strong></p>
+<ul>
+<li><strong>Repeatability and Reliability:</strong> Automation provides a consistent, repeatable process that ensures the same tests are run exactly the same way every time. This is critical for <strong>regression testing</strong>, which provides "cheap insurance" that existing functionality still works after changes.</li>
+<li><strong>Faster Feedback and Reduced Cycle Time:</strong> Automated tests provide rapid feedback to developers, often within minutes (for unit tests), allowing them to find and fix bugs when they are easiest and cheapest to address.</li>
+<li><strong>Efficiency in Repetitive Tasks:</strong> Automation frees highly skilled staff from "boring and repetitive" manual tasks like smoke tests or regression suites, allowing them to focus on higher-value activities.</li>
+<li><strong>Traceability and Auditability:</strong> Automated scripts serve as up-to-date documentation and provide a clear, auditable trail of what was tested and when.</li>
+<li><strong>Scalability:</strong> Automated tests can be run in parallel across multiple environments or on "compute grids," significantly reducing the total time required for extensive test suites.</li>
+</ul>
+<p><strong>Weaknesses</strong></p>
+<ul>
+<li><strong>High Initial Cost and Complexity:</strong> Establishing an automated framework requires a significant up-front investment in tools, time, and trained personnel with programming skills.</li>
+<li><strong>Maintenance Overhead:</strong> Automated tests can be expensive to maintain, especially <strong>UI tests</strong>, which are often "brittle" and break easily when minor changes are made to the user interface.</li>
+<li><strong>Lack of Creativity:</strong> Machines cannot mimic human creativity, variability, or observability; they only check for exactly what they have been programmed to find.</li>
+<li><strong>False Results:</strong> Poorly designed scripts can lead to "false positives" (tests that break due to script errors rather than bugs) or "false negatives" (bugs that go undetected).</li>
+</ul>
+<hr />
+<h3 id="manual-testing"><strong>Manual Testing</strong></h3>
+<p><strong>Strengths</strong></p>
+<ul>
+<li><strong>Exploratory and Creative Testing:</strong> Manual testing is the primary vehicle for <strong>exploratory testing</strong>, where testers use their intuition and experience to design new tests on the fly, often uncovering bugs or "bad ideas" that automated scripts would miss. See [[Manual Testing]] for the full manual testing process and when exploratory testing is used.</li>
+<li><strong>Usability and Look-and-Feel:</strong> Humans are uniquely equipped to evaluate qualitative aspects like usability, consistency of look-and-feel, and accessibility—areas where automated tools struggle.</li>
+<li><strong>Immediate Feedback on New Features:</strong> For one-time checks or rapidly changing codebases where automation would be too slow to develop, manual testing provides the fastest way to get an initial assessment of a new feature.</li>
+<li><strong>Complex Scenarios:</strong> Some situations, such as hardware interactions or integration with unstable external systems, may be prohibitively expensive or impossible to automate fully.</li>
+</ul>
+<p><strong>Weaknesses</strong></p>
+<ul>
+<li><strong>Error-Prone and Inconsistent:</strong> Manual testing is "fundamentally error-prone" because it relies on human memory and the consistent execution of repetitive tasks, which leads to sloppiness and oversight.</li>
+<li><strong>Prohibitively Expensive at Scale:</strong> Running a full suite of manual tests for every release is extremely costly and time-consuming, often becoming a bottleneck that prevents frequent releases.</li>
+<li><strong>Slow Feedback Loop:</strong> Unlike automated tests that can run on every check-in, manual testing usually happens at the end of a cycle, meaning developers receive bug reports weeks after they have moved on to new work.</li>
+<li><strong>Low Reusability:</strong> Manual tests are not easily repeatable across different versions and environments without duplicating the same labor-intensive effort.</li>
+</ul>
+<h3 id="the-test-automation-pyramid"><strong>The Test Automation Pyramid</strong></h3>
+<p>To maximize the strengths of both, the sources recommend the <strong>test automation pyramid</strong>. Popularized by Mike Cohn, the pyramid suggests that the majority of tests should be at the lower, faster levels, with fewer tests at the top, more expensive layers.</p>
+<ol>
+<li><strong>Unit Tests (The Base):</strong><ul>
+<li><strong>Definition:</strong> Automated unit tests form the foundation and should constitute the largest portion of the test suite. They typically test small, isolated pieces of code like functions or classes.</li>
+<li><strong>Advantages:</strong> They are extremely fast to execute and provide highly specific feedback to developers, often identifying the exact line of code containing a bug.</li>
+<li><strong>Implementation:</strong> These should ideally be written during development, often following a <strong>test-driven development (TDD)</strong> approach.</li>
+</ul>
+</li>
+<li><strong>Service Layer Tests (The Middle):</strong><ul>
+<li><strong>Definition:</strong> This layer focuses on testing the application's "services"—the logic that occurs in response to inputs—independently of the user interface.</li>
+<li><strong>Advantages:</strong> By bypassing the UI, these tests are less "brittle" and cheaper to maintain than UI-level tests. They fill the gap where unit tests cannot sufficiently cover integrated functionality.</li>
+<li><strong>Tooling:</strong> Tools such as <strong>FitNesse</strong> or <strong>Cucumber</strong> are often used to create these tests, which frequently take the form of "specifications by example" using spreadsheets or tables.</li>
+</ul>
+</li>
+<li><strong>User Interface (UI) Tests (The Apex):</strong><ul>
+<li><strong>Definition:</strong> These tests drive the application's actual user interface to confirm end-to-end functionality.</li>
+<li><strong>Weaknesses:</strong> UI tests are at the top of the pyramid because they should be minimized. They are often brittle (breaking easily when minor UI changes occur), expensive to write, and time-consuming to execute.</li>
+<li><strong>Purpose:</strong> Their primary role should be to verify that the underlying services are correctly "hooked up" to the UI elements and that data displays properly.</li>
+</ul>
+</li>
+</ol>
+<p><strong>Advantages of the Pyramid Strategy</strong></p>
+<ul>
+<li><strong>Faster Feedback:</strong> Relying on the base of fast unit tests allows developers to catch defects within minutes rather than waiting hours for a full end-to-end suite to run.</li>
+<li><strong>Reduced Costs:</strong> Automating tests early in the same sprint that a feature is developed provides the most value at the lowest cost.</li>
+<li><strong>Lower Maintenance:</strong> By reducing the number of brittle UI tests, the team spends less time fixing "false positives" (tests that break due to script errors rather than actual bugs).</li>
+<li>
+<p><strong>Eliminating Technical Debt:</strong> Following this structure helps teams avoid "testing debt," where a reliance on slow manual testing prevents frequent, reliable releases.</p>
+</li>
+<li>
+<p><strong>Diagram Reference:</strong> Test Automation Pyramid — <em>Succeeding with Agile</em>, Figure 7.3, p. 178; <em>Continuous Delivery</em>, Figure 16.1, p. 312. Relationship Between ATDD and TDD — <em>Succeeding with Agile</em>, Figure 16.3, p. 317.</p>
+</li>
+</ul>
+<h1 id="further-study-diagrams">Further Study Diagrams</h1>
+<p>A list of remaining diagrams from the sources — grouped by category — that don't map onto a single heading above but are worth looking at, drawing for practice, and studying to deepen understanding of software quality and testing.</p>
+<h3 id="the-testing-process-strategy">The Testing Process &amp; Strategy</h3>
+<p>(Testing Quadrant Diagram and ATDD/TDD relationship — see Diagram References under [[#Quality Revolution]] and [[#Strengths and Weakness of Automated and Manual Testing]] respectively.)</p>
+<h3 id="continuous-delivery-deployment-pipelines">Continuous Delivery &amp; Deployment Pipelines</h3>
+<ul>
+<li><strong>Changes Moving Through the Deployment Pipeline (Sequence Diagram):</strong> <em>Continuous Delivery</em>, Figure 5.2, p. 109.</li>
+<li><strong>The Acceptance Test Stage Workflow:</strong> <em>Continuous Delivery</em>, Figure 8.1, p. 187.</li>
+<li><strong>The Window Driver Pattern (Decoupling GUI from Tests):</strong> <em>Continuous Delivery</em>, Figure 8.3, p. 201.</li>
+<li><strong>Deployment Testing Layers:</strong> <em>Continuous Delivery</em>, Figure 6.3, p. 164.</li>
+</ul>
+<h3 id="agile-process-management">Agile &amp; Process Management</h3>
+<ul>
+<li><strong>SCRUM Iteration (The Sprint):</strong> <em>Software Quality Assurance</em> (Springer), Figure 3.8, p. 41.</li>
+<li><strong>Parallel Tracks for UED and Development:</strong> <em>Succeeding with Agile</em>, Figure 8.2, p. 152.</li>
+<li><strong>CMMI Levels of Maturity:</strong> <em>Software Quality Assurance</em> (Springer), Figure 3.9, p. 46.</li>
+<li><strong>The Iron Triangle (Scope, Resources, Schedule):</strong> <em>Succeeding with Agile</em>, Figure 15.3, p. 294.</li>
+</ul>
+<h3 id="reliability-defect-management">Reliability &amp; Defect Management</h3>
+<ul>
+<li><strong>Relationship Between MTTR, MTTF, and MTBF:</strong> <em>Software Testing and Quality Assurance</em> (Wiley), Figure 15.1, p. 475.</li>
+<li><strong>State Transition Diagram of a Defect (Life Cycle):</strong> <em>Software Testing and Quality Assurance</em> (Wiley), Figure 13.1, p. 409.</li>
+<li><strong>State Transition Diagram of a Requirement:</strong> <em>Software Testing and Quality Assurance</em> (Wiley), Figure 11.1, p. 323.</li>
+</ul>
+</body>
+</html>

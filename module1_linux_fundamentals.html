@@ -1,0 +1,1019 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Module 1 — Linux Fundamentals, Command Line, Package Management, IaC</title>
+<style>
+  body { max-width: 860px; margin: 0 auto; padding: 30px 20px 60px; font-family: system-ui, -apple-system, "Segoe UI", Arial, sans-serif; line-height: 1.6; color: #1a1a1a; }
+  a { color: #0645ad; }
+  a.home-link { display: inline-block; margin-bottom: 20px; font-size: 14px; }
+  h1, h2, h3, h4, h5, h6 { line-height: 1.3; }
+  pre { background: #f4f4f4; padding: 12px; overflow-x: auto; border: 1px solid #ddd; }
+  code { background: #f4f4f4; padding: 1px 4px; font-family: Consolas, "Courier New", monospace; }
+  pre code { background: none; padding: 0; }
+  table { border-collapse: collapse; width: 100%; margin: 12px 0; }
+  th, td { border: 1px solid #ccc; padding: 6px 10px; text-align: left; }
+  th { background: #f0f0f0; }
+  blockquote { border-left: 3px solid #ccc; margin: 10px 0; padding: 4px 14px; color: #444; }
+  hr { border: none; border-top: 1px solid #ddd; margin: 24px 0; }
+</style>
+</head>
+<body>
+<a class="home-link" href="index.html">&larr; Home</a>
+<h1 id="module-1">Module 1</h1>
+<h2 id="1-linux-fundamentals">1. Linux Fundamentals</h2>
+<h3 id="11-introduction-to-linux">1.1 Introduction to Linux</h3>
+<p>Linux was created by Linus Torvalds, Finland (University of Helsinki)</p>
+<p>Important Features of Linux: <strong>Free, Open Source ,Multi user in realtime, Multitasking, Secure, Portable, Stable</strong>. license GNU GPL</p>
+<h3 id="12-features-of-linux">1.2 Features of Linux</h3>
+<p>Linux has become a widely popular operating system due to several core features and philosophical tenets that distinguish it from commercial alternatives like Windows. According to the sources, the following five features have been instrumental in its success:</p>
+<ol>
+<li><strong>Open Source Accessibility and Cost</strong>: Most versions of Linux are <strong>freely available</strong>, and the underlying <strong>source code is open to the public</strong>. This allows a global community of developers to continuously enhance the software, fix security vulnerabilities, and add new features, ensuring the system grows at an impressive rate compared to proprietary software.</li>
+<li><strong>Granular Control through the Command Line (CLI)</strong>: Unlike other operating systems that often "shelter" users from the inner workings of the system, Linux emphasizes the <strong>Command Line Interface (CLI)</strong> as a source of power. The CLI allows for much greater precision and control, offering a wide variety of options in commands that are frequently hidden or unavailable in standard graphical interfaces.</li>
+<li><strong>Dominance in Server and Network Infrastructure</strong>: Linux is the principal operating system for <strong>Internet infrastructure</strong>, including a majority of the world's web, mail, database, and domain name servers. Its stability and reliability make it the preferred choice for high-stakes environments like web hosting and supercomputing.</li>
+<li><strong>Hardware and Platform Versatility</strong>: Linux is remarkably portable and can run on a <strong>vast range of devices</strong>. This includes everything from massive mainframes and supercomputers to handheld devices like Android-based smartphones, as well as specialized hardware such as routers, firewalls, and WiFi access points.</li>
+<li><strong>Resource Efficiency</strong>: Linux distributions are often designed to be <strong>lightweight</strong>, requiring fewer system resources (CPU and memory) to run effectively than many other mainstream operating systems. Because many of its operations can be performed via text-based interfaces rather than resource-heavy graphical ones, it often runs faster on the same hardware.</li>
+</ol>
+<h3 id="13-linux-philosophy">1.3 Linux Philosophy</h3>
+<p>The philosophy of Unix and Linux centers on <strong>modularity</strong>, <strong>simplicity</strong>, and the concept that <strong>"everything is a file."</strong> This approach emphasizes building small, cohesive tools that perform one task well and can be easily combined to solve complex problems.</p>
+<h4 id="everything-is-a-file">Everything is a File</h4>
+<p>One of the most fundamental tenets is that almost every entity in the operating system—including physical hardware, directories, and communication channels—is treated as a file. This abstraction allows users to apply the same set of standard commands (like <code>cp</code>, <code>mv</code>, or <code>rm</code>) and redirection operators to a wide variety of system components.</p>
+<ul>
+<li><strong>Example:</strong> In Linux, physical storage devices like hard drives are represented as files in the <code>/dev</code> directory (e.g., <code>/dev/sda1</code>). Because they are treated as files, a system administrator can use standard redirection to communicate with them or obtain information about them using tools like <code>stat</code> just as they would with a regular text document.</li>
+</ul>
+<h4 id="modularity-and-chaining-pipes">Modularity and Chaining (Pipes)</h4>
+<p>The Unix philosophy encourages <strong>high cohesion</strong> (tools that do one thing specifically) and <strong>low coupling</strong> (tools that don't depend heavily on each other). Instead of creating massive, monolithic programs, Linux provides specialized tools that communicate via <strong>text streams</strong>. These tools can be chained together using a <strong>pipe</strong> (<code>|</code>), which sends the output of one program to serve as the input for another.</p>
+<ul>
+<li><strong>Example:</strong> If a user wants to count how many files in a directory are readable and writable, they don't need a specific "permission counter" application. Instead, they can chain three small tools together: <code>ls -l</code> (to list files with permissions), <code>grep "^-rw"</code> (to filter for lines starting with file permissions for read/write), and <code>wc -l</code> (to count those lines). This modularity allows for nearly infinite flexibility without requiring complex new software for every unique task.</li>
+</ul>
+<h4 id="user-control-and-openness">User Control and Openness</h4>
+<p>The philosophy also prioritizes <strong>transparency and control</strong> over a "sheltered" user experience. The command line is viewed as the source of power, offering precision that graphical interfaces often hide. This is reinforced by the <strong>Open Source</strong> movement, which dictates that software should be free to study, change, and improve. This openness ensures that the community can continuously refine the kernel and applications, fostering a culture of experimentation and learning.</p>
+<h3 id="14-kernel">1.4 Kernel</h3>
+<p>The <strong>kernel</strong> is the <strong>core part of an Operating System (OS)</strong>. It acts as a bridge between <strong>applications</strong> and <strong>computer hardware</strong>.</p>
+<h4 id="simple-idea">Simple idea</h4>
+<pre><code class="language-text">┌─────────────────────┐
+│    Applications     │
+│ Chrome, VS Code...  │
+└──────────┬──────────┘
+           ↓
+┌─────────────────────┐
+│       KERNEL        │
+│                     │
+│ • CPU Management    │
+│ • Memory Management │
+│ • File Management   │
+│ • Device Management │
+└──────────┬──────────┘
+           ↓
+┌─────────────────────┐
+│      Hardware       │
+│ CPU • RAM • Disk    │
+│ Keyboard • Network  │
+└─────────────────────┘
+</code></pre>
+<h4 id="what-does-the-kernel-do">What does the kernel do?</h4>
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Process Management</strong></td>
+<td>Manages running programs and CPU time</td>
+</tr>
+<tr>
+<td><strong>Memory Management</strong></td>
+<td>Allocates RAM to programs</td>
+</tr>
+<tr>
+<td><strong>File Management</strong></td>
+<td>Controls access to files and storage</td>
+</tr>
+<tr>
+<td><strong>Device Management</strong></td>
+<td>Communicates with hardware devices</td>
+</tr>
+<tr>
+<td><strong>Security</strong></td>
+<td>Controls permissions and access</td>
+</tr>
+</tbody>
+</table>
+<h4 id="example">Example</h4>
+<p>When you open Chrome:</p>
+<p><strong>Chrome → Kernel → CPU/RAM/Disk</strong></p>
+<p>Chrome doesn't directly control the hardware. It <strong>requests the kernel</strong>, and the kernel manages the hardware on its behalf.</p>
+<blockquote>
+<p><strong>In one line:</strong> The <strong>kernel is the heart of an operating system that manages hardware resources and provides services to applications.</strong></p>
+</blockquote>
+<h3 id="15-shell">1.5 Shell</h3>
+<h4 id="151-what-is-a-shell">1.5.1 What is a Shell</h4>
+<p>A <strong>shell</strong> is a program that allows you to interact with the Linux operating system using commands.</p>
+<p>Examples:</p>
+<ul>
+<li>Bash</li>
+<li>Zsh</li>
+<li>Fish</li>
+</ul>
+<p>A <strong>shell</strong> is a user interface that acts as a layer between the user and the core components of the operating system, known as the <strong>kernel</strong>. It provides a user-tailored environment that includes a <strong>command-line interface (CLI)</strong>, an <strong>interpreter</strong>, and an <strong>environment</strong> of previously defined entities like variables, functions, and command shortcuts called aliases. The interpreter's primary role is to accept user input, translate the commands into executable code, and execute them. Users typically interact with a shell through a terminal window in a graphical interface or by logging into a text-based environment.</p>
+<h5 id="different-shells-available-in-linux">Different Shells Available in Linux</h5>
+<p>While many shells have been developed over the years, they generally fall into two main families: those based on the <strong>Bourne shell</strong> and those based on the <strong>C shell</strong>.</p>
+<ul>
+<li><strong>Thompson Shell:</strong> This was the earliest shell, introduced in Unix in 1971.</li>
+<li><strong>Bourne Shell (sh):</strong> Released in 1977 and named after its author, Stephen Bourne, it introduced fundamental features like shell scripts, redirection, pipes, and typeless variables.</li>
+<li><strong>C Shell (csh):</strong> Written by Bill Joy in the late 1970s, this shell uses a syntax largely based on the C programming language. It introduced several modern features now found in most shells, such as <strong>history</strong>, <strong>aliases</strong>, and <strong>command-line editing</strong>.</li>
+<li><strong>TC Shell (tcsh):</strong> A variation of the C shell developed between 1975 and 1983, it added greater operability for accessing commands in the history list.</li>
+<li><strong>KornShell (ksh):</strong> Developed by David Korn in 1983, it shares many features with the C shell but includes <strong>WYSIWYG-style</strong> command-line editing and support for floating-point variables.</li>
+<li><strong>Almquist Shell (ash):</strong> A smaller, faster variation of the Bourne shell released in 1989 for computers with modest resources. It has largely been replaced in many systems by a newer version called <strong>dash</strong>.</li>
+<li><strong>Bourne-Again Shell (Bash):</strong> Released in 1989 by Brian Fox for the GNU project, it is the <strong>default shell</strong> for most Linux distributions. It is an extension of the Bourne shell and incorporates the best features of the C and TC shells, including advanced command-line editing and tab completion.</li>
+<li><strong>Z Shell (zsh):</strong> Released in 1990 as an extension of both the Bourne and Korn shells, it adds unique features like <strong>automated spelling correction</strong>, customizable prompts, and modules for mathematical and network computations.</li>
+<li><strong>Specialized Language Shells:</strong> Some shells have been adapted to support specific programming languages, such as <strong>Rhino/BeanShell</strong> (Java), <strong>psh</strong> (Perl), <strong>sqsh</strong> (SQL), and <strong>scsh</strong> (Scheme).</li>
+</ul>
+<h4 id="152-shell-environment">1.5.2 Shell Environment</h4>
+<p>In the Linux shell, your environment is tailored through the use of variables, redirection, pipes, and filters. These tools allow you to manage data streams and automate complex tasks by combining simple commands.</p>
+<h5 id="1-environment-variables">1. Environment Variables</h5>
+<p>A <strong>variable</strong> is a name that references a value stored in memory. <strong>Environment variables</strong> are predefined variables used by the operating system and other programs to determine how the system behaves.</p>
+<ul>
+<li><strong>Viewing Variables:</strong> Use the <code>env</code> command to see all defined environment variables.</li>
+<li><strong>Accessing Values:</strong> Precede the variable name with a <code>$</code> (e.g., <code>echo $HOME</code>).</li>
+<li><strong>Common Examples:</strong><ul>
+<li><code>HOME</code>: Stores the path to the user's home directory.</li>
+<li><code>PWD</code>: Stores the current working directory.</li>
+<li><code>PATH</code>: A list of directories the shell searches to find executable programs when a command is entered.</li>
+<li><code>PS1</code>: Defines the appearance of the command-line prompt.</li>
+</ul>
+</li>
+</ul>
+<h5 id="2-redirection">2. Redirection</h5>
+<p>Redirection allows you to change where a command receives its input or sends its output. By default, standard input (<strong>STDIN</strong>) comes from the keyboard, and standard output (<strong>STDOUT</strong>) and standard error (<strong>STDERR</strong>) go to the terminal window.</p>
+<ul>
+<li><strong>Output Redirection (<code>&gt;</code> and <code>&gt;&gt;</code>):</strong><ul>
+<li><code>&gt;</code> sends output to a file, overwriting it (e.g., <code>ls &gt; file_list.txt</code>).</li>
+<li><code>&gt;&gt;</code> appends output to the end of an existing file (e.g., <code>date &gt;&gt; log.txt</code>).</li>
+</ul>
+</li>
+<li><strong>Input Redirection (<code>&lt;</code> and <code>&lt;&lt;</code>):</strong><ul>
+<li><code>&lt;</code> uses a file as input for a command (e.g., <code>wc -l &lt; data.txt</code>).</li>
+<li><code>&lt;&lt;</code> (Here Document) reads input from the keyboard until a specific delimiter string is typed (e.g., <code>cat &lt;&lt; done &gt; newfile.txt</code> reads until the user types "done").</li>
+</ul>
+</li>
+</ul>
+<h5 id="3-pipes">3. Pipes</h5>
+<p>A <strong>pipe</strong> (<code>|</code>) is a specific form of redirection that sends the output of one command to serve as the input for the next command. This allows for "chaining" multiple commands together to perform complex data processing.</p>
+<ul>
+<li><strong>Example:</strong> To count the number of files in a directory, you can pipe the output of <code>ls</code> into the <code>wc</code> (word count) tool: <code>ls -1 | wc -l</code>.</li>
+</ul>
+<h5 id="4-filters">4. Filters</h5>
+<p><strong>Filters</strong> are programs that accept a stream of text as input, process it (e.g., searching, sorting, or modifying), and then output the result. They are almost always used in conjunction with pipes.</p>
+<ul>
+<li><strong>Common Filter Examples:</strong><ul>
+<li><code>grep</code>: Searches for lines that match a specific regular expression pattern. <em>Example:</em> <code>ps aux | grep bash</code> (filters the process list for only those containing "bash").</li>
+<li><code>sort</code>: Sorts the lines of text alphabetically or numerically. <em>Example:</em> <code>cat names.txt | sort</code>.</li>
+<li><code>uniq</code>: Removes consecutive duplicate lines from a sorted file.</li>
+<li><code>sed</code>: A stream editor used to search for and replace strings within a text stream. <em>Example:</em> <code>echo "Hello World" | sed 's/World/Linux/'</code> (outputs "Hello Linux").</li>
+<li><code>awk</code>: A powerful pattern-scanning and processing language used to extract and manipulate specific data fields. <em>Example:</em> <code>ls -l | awk '/^-/ {print $5, $9}'</code> (filters for regular files and prints only their size and name).</li>
+</ul>
+</li>
+</ul>
+<h4 id="153-shell-scripting">1.5.3 Shell Scripting</h4>
+<p><strong>Shell programming</strong> means writing a sequence of shell commands in a <strong>script</strong> to automate tasks.</p>
+<pre><code class="language-text">User
+  ↓
+Shell
+  ↓
+Linux Kernel
+  ↓
+Hardware
+</code></pre>
+<h5 id="shell-script">Shell Script</h5>
+<p>A shell script is usually a file ending in <code>.sh</code>.</p>
+<p>Example:</p>
+<pre><code class="language-bash">#!/bin/bash
+
+echo &quot;Hello, World!&quot;
+</code></pre>
+<p>Save it as:</p>
+<pre><code class="language-text">hello.sh
+</code></pre>
+<p>Run it:</p>
+<pre><code class="language-bash">chmod +x hello.sh
+./hello.sh
+</code></pre>
+<p>Output:</p>
+<pre><code class="language-text">Hello, World!
+</code></pre>
+<hr />
+<h5 id="simple-shell-programs">Simple Shell Programs</h5>
+<h6 id="1-variables">1. Variables</h6>
+<pre><code class="language-bash">#!/bin/bash
+
+name=&quot;Kaustubha&quot;
+
+echo &quot;Hello $name&quot;
+</code></pre>
+<hr />
+<h6 id="2-taking-input">2. Taking Input</h6>
+<pre><code class="language-bash">#!/bin/bash
+
+echo &quot;Enter your name:&quot;
+read name
+
+echo &quot;Hello $name&quot;
+</code></pre>
+<hr />
+<h6 id="3-if-else">3. If-Else</h6>
+<pre><code class="language-bash">#!/bin/bash
+
+age=20
+
+if [ $age -ge 18 ]
+then
+    echo &quot;Adult&quot;
+else
+    echo &quot;Minor&quot;
+fi
+</code></pre>
+<hr />
+<h6 id="4-loop">4. Loop</h6>
+<pre><code class="language-bash">#!/bin/bash
+
+for i in 1 2 3 4 5
+do
+    echo &quot;Number: $i&quot;
+done
+</code></pre>
+<p>Output:</p>
+<pre><code class="language-text">Number: 1
+Number: 2
+Number: 3
+Number: 4
+Number: 5
+</code></pre>
+<hr />
+<h6 id="5-simple-devops-example">5. Simple DevOps Example</h6>
+<p>A shell script can automate server tasks:</p>
+<pre><code class="language-bash">#!/bin/bash
+
+echo &quot;Updating packages...&quot;
+sudo apt update
+
+echo &quot;Installing nginx...&quot;
+sudo apt install nginx -y
+
+echo &quot;Done!&quot;
+</code></pre>
+<h5 id="key-idea">⭐ Key idea</h5>
+<blockquote>
+<p><strong>Shell scripting = combining Linux commands into a script to automate repetitive tasks.</strong></p>
+</blockquote>
+<p>This is especially important in <strong>DevOps automation, server administration, CI/CD, and deployment</strong>.</p>
+<h3 id="16-vi-vim-editor">1.6 vi / vim Editor</h3>
+<p><strong>Vim</strong> is a command-line text editor commonly available on Linux systems. <strong>vi</strong> is its older/original version.</p>
+<p>It is useful in DevOps because you often edit configuration files directly on remote Linux servers.</p>
+<h4 id="basic-vim-workflow">Basic Vim workflow</h4>
+<pre><code class="language-text">Open file
+   ↓
+Command Mode
+   ↓
+Press i
+   ↓
+Insert Mode → Write/Edit
+   ↓
+Press Esc
+   ↓
+Command Mode
+   ↓
+:w → Save
+:q → Quit
+</code></pre>
+<p><strong>Remember:</strong> Vim has different modes. The most important are <strong>Normal/Command mode</strong> and <strong>Insert mode</strong>.</p>
+<hr />
+<h2 id="2-linux-command-line">2. Linux Command Line</h2>
+<h3 id="21-basic-commands-to-know">2.1 Basic Commands to Know</h3>
+<p>These are the <strong>basic Linux commands you should know first</strong>, especially for DevOps.</p>
+<h4 id="navigation-files">📁 Navigation &amp; Files</h4>
+<table>
+<thead>
+<tr>
+<th>Command</th>
+<th>Purpose</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>pwd</code></td>
+<td>Show current directory</td>
+<td><code>pwd</code></td>
+</tr>
+<tr>
+<td><code>ls</code></td>
+<td>List files/folders</td>
+<td><code>ls</code></td>
+</tr>
+<tr>
+<td><code>ls -l</code></td>
+<td>Detailed list</td>
+<td><code>ls -l</code></td>
+</tr>
+<tr>
+<td><code>ls -a</code></td>
+<td>Show hidden files</td>
+<td><code>ls -a</code></td>
+</tr>
+<tr>
+<td><code>cd</code></td>
+<td>Change directory</td>
+<td><code>cd Documents</code></td>
+</tr>
+<tr>
+<td><code>cd ..</code></td>
+<td>Go one directory back</td>
+<td><code>cd ..</code></td>
+</tr>
+<tr>
+<td><code>cd ~</code></td>
+<td>Go to home directory</td>
+<td><code>cd ~</code></td>
+</tr>
+<tr>
+<td><code>mkdir</code></td>
+<td>Create directory</td>
+<td><code>mkdir project</code></td>
+</tr>
+<tr>
+<td><code>touch</code></td>
+<td>Create empty file</td>
+<td><code>touch file.txt</code></td>
+</tr>
+<tr>
+<td><code>cp</code></td>
+<td>Copy file/folder</td>
+<td><code>cp a.txt b.txt</code></td>
+</tr>
+<tr>
+<td><code>mv</code></td>
+<td>Move/rename</td>
+<td><code>mv old.txt new.txt</code></td>
+</tr>
+<tr>
+<td><code>rm</code></td>
+<td>Delete file</td>
+<td><code>rm file.txt</code></td>
+</tr>
+<tr>
+<td><code>rmdir</code></td>
+<td>Delete empty directory</td>
+<td><code>rmdir folder</code></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h4 id="viewing-files">📖 Viewing Files</h4>
+<h5 id="cat"><code>cat</code></h5>
+<p>Displays the contents of a file.</p>
+<pre><code class="language-bash">cat file.txt
+</code></pre>
+<p>Other useful commands:</p>
+<table>
+<thead>
+<tr>
+<th>Command</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>cat</code></td>
+<td>Display entire file</td>
+</tr>
+<tr>
+<td><code>less</code></td>
+<td>Read large file page-by-page</td>
+</tr>
+<tr>
+<td><code>head</code></td>
+<td>Show first lines</td>
+</tr>
+<tr>
+<td><code>tail</code></td>
+<td>Show last lines</td>
+</tr>
+<tr>
+<td><code>tail -f</code></td>
+<td>Continuously monitor new output</td>
+</tr>
+</tbody>
+</table>
+<p>Example:</p>
+<pre><code class="language-bash">head file.txt
+tail file.txt
+tail -f app.log
+</code></pre>
+<hr />
+<h4 id="searching">🔎 Searching</h4>
+<table>
+<thead>
+<tr>
+<th>Command</th>
+<th>Purpose</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>find</code></td>
+<td>Find files/folders</td>
+<td><code>find . -name "*.txt"</code></td>
+</tr>
+<tr>
+<td><code>grep</code></td>
+<td>Search text</td>
+<td><code>grep "error" app.log</code></td>
+</tr>
+<tr>
+<td><code>which</code></td>
+<td>Find command location</td>
+<td><code>which python</code></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h4 id="permissions-users">🔐 Permissions &amp; Users</h4>
+<table>
+<thead>
+<tr>
+<th>Command</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>whoami</code></td>
+<td>Show current user</td>
+</tr>
+<tr>
+<td><code>id</code></td>
+<td>Show user/group information</td>
+</tr>
+<tr>
+<td><code>sudo</code></td>
+<td>Run command with elevated privileges</td>
+</tr>
+<tr>
+<td><code>chmod</code></td>
+<td>Change permissions</td>
+</tr>
+<tr>
+<td><code>chown</code></td>
+<td>Change file owner</td>
+</tr>
+</tbody>
+</table>
+<p>Example:</p>
+<pre><code class="language-bash">sudo chmod +x script.sh
+</code></pre>
+<hr />
+<h4 id="processes-system">⚙️ Processes &amp; System</h4>
+<table>
+<thead>
+<tr>
+<th>Command</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ps</code></td>
+<td>Show processes</td>
+</tr>
+<tr>
+<td><code>top</code></td>
+<td>Monitor running processes</td>
+</tr>
+<tr>
+<td><code>kill</code></td>
+<td>Stop a process</td>
+</tr>
+<tr>
+<td><code>df -h</code></td>
+<td>Check disk space</td>
+</tr>
+<tr>
+<td><code>du -sh</code></td>
+<td>Check folder size</td>
+</tr>
+<tr>
+<td><code>free -h</code></td>
+<td>Check RAM</td>
+</tr>
+<tr>
+<td><code>uname -a</code></td>
+<td>System information</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h4 id="networking">🌐 Networking</h4>
+<table>
+<thead>
+<tr>
+<th>Command</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ping</code></td>
+<td>Test connectivity</td>
+</tr>
+<tr>
+<td><code>ip</code></td>
+<td>Network information</td>
+</tr>
+<tr>
+<td><code>curl</code></td>
+<td>Make HTTP requests</td>
+</tr>
+<tr>
+<td><code>wget</code></td>
+<td>Download files</td>
+</tr>
+<tr>
+<td><code>ssh</code></td>
+<td>Connect to remote server</td>
+</tr>
+<tr>
+<td><code>scp</code></td>
+<td>Copy files between machines</td>
+</tr>
+</tbody>
+</table>
+<p>Example:</p>
+<pre><code class="language-bash">ssh user@192.168.1.10
+</code></pre>
+<hr />
+<h4 id="package-management">📦 Package Management</h4>
+<p>For Red Hat/Fedora:</p>
+<pre><code class="language-bash">sudo yum install nginx
+sudo yum update
+</code></pre>
+<p>Modern systems commonly use:</p>
+<pre><code class="language-bash">sudo dnf install nginx
+</code></pre>
+<p>For Ubuntu/Debian:</p>
+<pre><code class="language-bash">sudo apt install nginx
+sudo apt update
+</code></pre>
+<hr />
+<h4 id="very-useful-commands">🧰 Very Useful Commands</h4>
+<table>
+<thead>
+<tr>
+<th>Command</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>clear</code></td>
+<td>Clear terminal</td>
+</tr>
+<tr>
+<td><code>history</code></td>
+<td>Show previous commands</td>
+</tr>
+<tr>
+<td><code>man</code></td>
+<td>Command manual</td>
+</tr>
+<tr>
+<td><code>echo</code></td>
+<td>Print text</td>
+</tr>
+<tr>
+<td><code>date</code></td>
+<td>Show date/time</td>
+</tr>
+<tr>
+<td><code>exit</code></td>
+<td>Exit terminal/session</td>
+</tr>
+<tr>
+<td><code>clear</code></td>
+<td>Clear screen</td>
+</tr>
+</tbody>
+</table>
+<p>Example:</p>
+<pre><code class="language-bash">man ls
+</code></pre>
+<p>This shows the manual/documentation for <code>ls</code>.</p>
+<h4 id="priority-for-beginners">⭐ Priority for Beginners</h4>
+<p>Learn these <strong>first</strong>:</p>
+<pre><code class="language-text">pwd → ls → cd → mkdir → touch
+        ↓
+cat → cp → mv → rm
+        ↓
+grep → find
+        ↓
+sudo → chmod → chown
+        ↓
+ps → top → df → free
+        ↓
+ssh → curl → ping
+        ↓
+yum/dnf/apt
+</code></pre>
+<p>These commands cover most of the <strong>basic Linux + DevOps command-line work</strong> you'll encounter.</p>
+<h3 id="22-process-and-service-management">2.2 Process and Service Management</h3>
+<p>In Linux, the management of system activity is handled through two closely related concepts: <strong>processes</strong> and <strong>services</strong> (also known as daemons). While a service is technically a type of process, they differ in their intended purpose and how they are handled by the system.</p>
+<h4 id="processes-vs-services">Processes vs. Services</h4>
+<ul>
+<li><strong>Process:</strong> A process is defined as any <strong>running program</strong>. It is an "active entity" that contains code, has memory space for data, and possesses a specific state (such as its current instruction and register values). Every process is assigned a unique <strong>Process ID (PID)</strong> for tracking.</li>
+<li><strong>Service (Daemon):</strong> A service is a specific type of process that runs <strong>in the background</strong> to handle requests from users, applications, or other system components on demand. Unlike standard application processes that a user might interact with directly, services usually lack a user interface and remain idle until they are called upon.</li>
+<li><strong>Key Difference:</strong> While most processes are started by users to perform a specific task and terminate once that task is done, services are typically started during <strong>system initialization</strong> and remain available throughout the entire session to provide ongoing support for system functions like networking, printing, or scheduling.</li>
+</ul>
+<h4 id="managing-processes-in-linux">Managing Processes in Linux</h4>
+<p>Linux uses several commands to monitor and control the lifecycle of processes:</p>
+<ul>
+<li><strong>Monitoring:</strong><ul>
+<li><strong><code>ps</code> (Process Status):</strong> Provides a snapshot of currently running processes. Common options like <code>ps aux</code> show processes for all users across the system.</li>
+<li><strong><code>top</code>:</strong> An interactive, text-based tool that provides real-time updates on resource utilization (CPU, memory) and active processes.</li>
+<li><strong><code>jobs</code>:</strong> Displays processes that are currently suspended or running in the background within the specific terminal window.</li>
+</ul>
+</li>
+<li><strong>Control and Prioritization:</strong><ul>
+<li><strong><code>kill</code> and <code>killall</code>:</strong> Used to terminate processes. <code>kill</code> requires a specific PID, while <code>killall</code> can terminate all instances of a process by its name.</li>
+<li><strong><code>bg</code> and <code>fg</code>:</strong> Used to move processes between the background and foreground within a shell session.</li>
+<li><strong><code>nice</code> and <code>renice</code>:</strong> These adjust a process's <strong>niceness value</strong>, which determines its priority; a higher niceness value means the process is "nicer" to others and receives less CPU time.</li>
+</ul>
+</li>
+</ul>
+<h4 id="managing-services-in-linux">Managing Services in Linux</h4>
+<p>Services are managed through specific administrative tools and configuration files:</p>
+<ul>
+<li><strong><code>service</code>:</strong> This command-line utility is used to start, stop, restart, or check the status of a specific service (e.g., <code>/sbin/service atd status</code>).</li>
+<li><strong><code>/etc/init.d/</code> Scripts:</strong> This directory contains the actual controlling scripts for services. System administrators can invoke these scripts directly to manage a service (e.g., <code>./nfs start</code>).</li>
+<li><strong><code>chkconfig</code>:</strong> Used to view or alter which <strong>runlevels</strong> a service is configured to start or stop in automatically during system initialization.</li>
+<li><strong><code>systemctl</code>:</strong> In newer Linux distributions that use the <strong>systemd</strong> init system (such as Fedora or Ubuntu), <code>systemctl</code> is the primary command used to enable, disable, start, or stop services.</li>
+<li><strong>Configuration Files:</strong> Most services are tuned using text-based configuration files, typically located in the <code>/etc</code> directory. For example, the <code>rsyslog</code> service is configured via <code>/etc/rsyslog.conf</code>.</li>
+</ul>
+<h3 id="23-soft-and-hard-links">2.3 Soft and Hard Links</h3>
+<p>In Linux and Unix-based systems, links are mechanisms that allow a single file to be referenced by multiple names or from multiple locations within the file system. They are categorized into two types: <strong>hard links</strong> and <strong>soft (symbolic) links</strong>.</p>
+<h4 id="1-hard-links">1. Hard Links</h4>
+<p>A <strong>hard link</strong> is essentially an additional name for an existing file's data.</p>
+<ul>
+<li><strong>Implementation:</strong> Technically, a directory in Linux is a list of entries where each entry maps a filename to an <strong>inode number</strong>. An inode is a data structure that stores all information about a file (permissions, owner, size, timestamps) except its name and the actual data blocks. A hard link is simply a new entry in a directory that points to an existing inode number.</li>
+<li><strong>Behavior:</strong> Because multiple hard links point to the same inode, they are all "original" copies of the file. If you modify the content through one link, it changes for all.</li>
+<li><strong>Persistence:</strong> Each file has a <strong>link count</strong> stored in its inode. When you delete a hard link, the system decrements this count. The actual data and the inode are only deleted from the disk when the link count reaches <strong>zero</strong>.</li>
+</ul>
+<h4 id="2-soft-symbolic-links">2. Soft (Symbolic) Links</h4>
+<p>A <strong>soft link</strong>, or <strong>symbolic link (symlink)</strong>, is a special type of file that contains a text string representing the <strong>path</strong> to another file or directory.</p>
+<ul>
+<li><strong>Implementation:</strong> Unlike hard links, a soft link has its own unique inode number and its own data blocks, which store the destination path. It acts as a pointer to the original file's name.</li>
+<li><strong>Behavior:</strong> When the operating system accesses a symlink, it sees the "pointer" and automatically redirects the request to the target path. In a long listing (<code>ls -l</code>), symlinks are identified by the character <code>l</code> and an arrow showing the target (e.g., <code>link -&gt; /path/to/file</code>).</li>
+<li><strong>Persistence:</strong> If the original file is moved or deleted, the symlink remains but becomes <strong>"broken"</strong> or "dangling," because the path it points to no longer exists. Deleting the symlink itself has no effect on the original file.</li>
+</ul>
+<h4 id="why-do-we-have-both-types">Why do we have both types?</h4>
+<p>The two types of links serve different functional needs based on their limitations and strengths:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Feature</th>
+<th style="text-align: left;">Hard Links</th>
+<th style="text-align: left;">Soft (Symbolic) Links</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Cross-Partition</strong></td>
+<td style="text-align: left;"><strong>No.</strong> Cannot link files across different disk partitions or file systems.</td>
+<td style="text-align: left;"><strong>Yes.</strong> Can point to files on different partitions or even remote network drives.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Directories</strong></td>
+<td style="text-align: left;"><strong>Usually No.</strong> Hard linking directories is restricted to prevent circular loops.</td>
+<td style="text-align: left;"><strong>Yes.</strong> You can link to directories as easily as files.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Data Safety</strong></td>
+<td style="text-align: left;"><strong>High.</strong> The file data exists as long as at least one hard link remains.</td>
+<td style="text-align: left;"><strong>Lower.</strong> If the target is deleted, the link becomes useless.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Use Case</strong></td>
+<td style="text-align: left;">Useful for data redundancy within a partition or making the same data accessible under different names.</td>
+<td style="text-align: left;">Ideal for creating shortcuts, organizing system libraries, or maintaining references to files that might be updated/moved.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="3-package-management">3. Package Management</h2>
+<h3 id="31-source-code-and-packages">3.1 Source Code and Packages</h3>
+<h4 id="what-is-source-code">What is Source Code?</h4>
+<p><strong>Source code</strong> is the human-readable code written by a programmer to create a software application.</p>
+<p>Example:</p>
+<pre><code class="language-python">print(&quot;Hello World&quot;)
+</code></pre>
+<p>The programmer writes <strong>source code</strong>, which is then processed/interpreted/compiled so the computer can execute it.</p>
+<hr />
+<h4 id="what-is-a-package">What is a Package?</h4>
+<p>A <strong>package</strong> is a collection of software files bundled together so that a program can be easily <strong>installed, updated, or removed</strong>.</p>
+<p>Example:</p>
+<pre><code class="language-text">Package
+├── Application files
+├── Configuration
+├── Dependencies
+└── Metadata
+</code></pre>
+<p>Example: <code>nginx</code>, <code>git</code>, <code>python3</code> can be distributed as packages.</p>
+<hr />
+<h3 id="32-package-management-overview">3.2 Package Management Overview</h3>
+<p><strong>Package management</strong> is the process of <strong>installing, updating, removing, and managing software packages and their dependencies</strong>.</p>
+<pre><code class="language-text">Developer
+    ↓
+Package Manager
+    ↓
+Package Repository
+    ↓
+Download + Install
+    ↓
+Software
+</code></pre>
+<h4 id="role-in-devops">Role in DevOps</h4>
+<p>Package management helps DevOps teams:</p>
+<ul>
+<li>
+<p>Install software consistently</p>
+</li>
+<li>
+<p>Manage dependencies</p>
+</li>
+<li>
+<p>Automate server setup</p>
+</li>
+<li>
+<p>Keep software updated</p>
+</li>
+<li>
+<p>Roll back problematic versions</p>
+</li>
+<li>
+<p>Maintain reproducible environments</p>
+</li>
+</ul>
+<p>Package management systems are essential tools in Linux that automate the process of <strong>installing, updating, configuring, and removing software</strong>. Instead of requiring a system administrator to manually compile source code or track file placements, these systems manage these tasks efficiently.</p>
+<h4 id="how-package-management-helps">How Package Management Helps</h4>
+<ul>
+<li><strong>Automatic Dependency Resolution</strong>: This is one of the most critical benefits. Many programs require specific software libraries (shared object files like <code>.so</code> files) to function. Package managers identify these needs and automatically install the required libraries, preventing "dependency hell".</li>
+<li><strong>Integrity and Security Checks</strong>: They use checksums and digital signatures to verify that packages are legitimate and have not been tampered with.</li>
+<li><strong>Simplified Maintenance</strong>: They facilitate clean software updates, patches, and removals. When removing software, they identify all associated files and only delete those that are not needed by other installed packages.</li>
+<li><strong>Efficiency</strong>: They save significant time and reduce the likelihood of human error compared to manual installation.</li>
+</ul>
+<hr />
+<h4 id="important-package-manager-keywords">Important Package Manager Keywords</h4>
+<table>
+<thead>
+<tr>
+<th>Keyword</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Install</strong></td>
+<td>Install a package</td>
+</tr>
+<tr>
+<td><strong>Update/Upgrade</strong></td>
+<td>Get a newer version</td>
+</tr>
+<tr>
+<td><strong>Remove</strong></td>
+<td>Uninstall a package</td>
+</tr>
+<tr>
+<td><strong>Search</strong></td>
+<td>Find packages</td>
+</tr>
+<tr>
+<td><strong>Dependency</strong></td>
+<td>Another package required by software</td>
+</tr>
+<tr>
+<td><strong>Repository</strong></td>
+<td>Place where packages are stored</td>
+</tr>
+<tr>
+<td><strong>Version</strong></td>
+<td>Specific release of a package</td>
+</tr>
+<tr>
+<td><strong>Rollback</strong></td>
+<td>Return to an earlier version</td>
+</tr>
+</tbody>
+</table>
+<h5 id="examples">Examples</h5>
+<table>
+<thead>
+<tr>
+<th>OS</th>
+<th>Package Manager</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Ubuntu/Debian</td>
+<td><code>apt</code></td>
+</tr>
+<tr>
+<td>Fedora</td>
+<td><code>dnf</code></td>
+</tr>
+<tr>
+<td>Arch Linux</td>
+<td><code>pacman</code></td>
+</tr>
+<tr>
+<td>RHEL/CentOS</td>
+<td><code>dnf</code> / <code>yum</code></td>
+</tr>
+<tr>
+<td>macOS</td>
+<td><code>brew</code></td>
+</tr>
+<tr>
+<td>Windows</td>
+<td><code>winget</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Fedora:</strong> A Linux distribution that uses <strong>DNF</strong> as its primary package manager.</p>
+<p><strong>Kubernetes:</strong> An open-source platform for <strong>automating deployment, scaling, and management of containerized applications</strong>.</p>
+<hr />
+<h3 id="33-rpm-red-hat-package-manager">3.3 RPM (Red Hat Package Manager)</h3>
+<p>RPM is a core, lower-level package management tool used primarily in Red Hat-based distributions like CentOS and Fedora.</p>
+<ul>
+<li><strong>Package Format</strong>: RPM files are archives compressed with <code>gzip</code>. They use a standard naming convention: <code>software_name-version-release.architecture.rpm</code>.</li>
+<li><strong>Functionality</strong>: It can install, upgrade, or erase software, but it is <strong>primitive</strong> in that it does not automatically handle dependencies. If a package is missing a required library, RPM will simply report an error, leaving the user to find and install the missing piece manually.</li>
+<li><strong>Core Commands</strong>:<ul>
+<li><code>rpm -i</code>: Installs a package.</li>
+<li><code>rpm -U</code>: Upgrades an existing package or installs it if not present.</li>
+<li><code>rpm -e</code>: Erases (removes) a package.</li>
+</ul>
+</li>
+<li><strong>Building Packages</strong>: Advanced users use "spec files" to define how an RPM should be built, including its dependencies and build instructions.</li>
+</ul>
+<hr />
+<h3 id="34-yum-yellowdog-updater-modified">3.4 YUM (Yellowdog Updater, Modified)</h3>
+<p><strong>YUM</strong> is a package manager traditionally used in <strong>Red Hat-based Linux distributions</strong> such as RHEL and CentOS.</p>
+<blockquote>
+<p>Modern RHEL-based systems use <strong>DNF</strong>, which is the successor to YUM. <code>yum</code> is often retained as a compatibility command.</p>
+</blockquote>
+<p>YUM is a high-level package management tool that acts as a front-end for RPM. It was designed to overcome the limitations of RPM.</p>
+<h4 id="purpose-of-yum">Purpose of YUM</h4>
+<p>YUM is used to <strong>install, update, remove, and manage software packages and their dependencies</strong>.</p>
+<pre><code class="language-text">User
+  ↓
+YUM
+  ↓
+Repository
+  ↓
+Package + Dependencies
+  ↓
+Linux System
+</code></pre>
+<ul>
+<li><strong>Automation</strong>: Unlike RPM, YUM <strong>automatically resolves dependencies</strong> by searching pre-configured online repositories and downloading all necessary files in one go.</li>
+<li><strong>Repositories</strong>: Users do not need to manually download package files first; YUM fetches them directly from the internet.</li>
+<li><strong>Scalability</strong>: It can be used to manage updates across a server farm and can be scheduled to run automatically to keep systems patched.</li>
+</ul>
+<h4 id="use-case">Use Case</h4>
+<p>Suppose you need <strong>Nginx</strong> on a server:</p>
+<pre><code class="language-bash">sudo yum install nginx -y
+</code></pre>
+<p>YUM will:</p>
+<ol>
+<li>
+<p>Find Nginx in the configured repository.</p>
+</li>
+<li>
+<p>Find required dependencies.</p>
+</li>
+<li>
+<p>Download the packages.</p>
+</li>
+<li>
+<p>Install them.</p>
+</li>
+</ol>
+<h4 id="yum-update-vs-yum-upgrade"><code>yum update</code> vs <code>yum upgrade</code></h4>
+<table>
+<thead>
+<tr>
+<th>Command</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>yum update</code></td>
+<td>Updates installed packages to newer available versions</td>
+</tr>
+<tr>
+<td><code>yum upgrade</code></td>
+<td>Also updates packages, generally allowing replacement/removal of packages when required by dependency changes</td>
+</tr>
+</tbody>
+</table>
+<p>For basic exam/interview understanding:</p>
+<blockquote>
+<p><strong><code>update</code> → update existing packages</strong><br />
+<strong><code>upgrade</code> → update packages + handle dependency changes more aggressively</strong></p>
+</blockquote>
+<h4 id="core-commands">Core Commands</h4>
+<ul>
+<li><code>yum install [package]</code>: Finds, downloads, and installs software.</li>
+<li><code>yum update</code>: Upgrades specified packages or the entire system if no package is named.</li>
+<li><code>yum remove</code>: Uninstalls software cleanly.</li>
+<li><code>yum check-update</code>: Lists available upgrades without installing them.</li>
+</ul>
+<pre><code class="language-bash"># Install
+sudo yum install nginx -y
+
+# Update all packages
+sudo yum update
+
+# Remove package
+sudo yum remove nginx
+
+# Search for a package
+yum search nginx
+
+# Show package information
+yum info nginx
+
+# List installed packages
+yum list installed
+
+# Check available updates
+yum check-update
+</code></pre>
+<p><strong><code>-y</code></strong> means <strong>automatically answer "yes"</strong> to confirmation prompts. The <code>-y</code> option allows YUM to run without user interaction by automatically assuming "yes" to all prompts.</p>
+<h4 id="evolution">Evolution</h4>
+<p>In recent distributions, YUM is being replaced by <strong>dnf</strong>, which is a compatible rewrite with the same command-line interface.</p>
+<hr />
+<h3 id="35-package-rollback">3.5 Package Rollback</h3>
+<p><strong>Rollback</strong> means returning software to a <strong>previous working version</strong> when an update causes problems.</p>
+<pre><code class="language-text">Version 1.0
+    ↓
+Version 2.0  ← Update
+    ↓
+❌ Problem
+    ↓
+Rollback
+    ↓
+Version 1.0  ✅
+</code></pre>
+<h4 id="why-useful-in-devops">Why useful in DevOps?</h4>
+<p>Suppose a production server gets an update:</p>
+<pre><code class="language-text">App v1.5 → App v2.0
+              ↓
+           Bug found
+              ↓
+        Rollback to v1.5
+</code></pre>
+<p>This allows the service to recover quickly.</p>
+<hr />
+<h2 id="4-infrastructure-as-code">4. Infrastructure as Code</h2>
+<h3 id="41-terraform">4.1 Terraform</h3>
+<p><strong>Terraform</strong> is an <strong>Infrastructure as Code (IaC)</strong> tool developed by HashiCorp.</p>
+<p>It allows you to define infrastructure using configuration files instead of manually creating servers, networks, databases, etc.</p>
+<pre><code class="language-text">Terraform Code
+      ↓
+Terraform
+      ↓
+Cloud Provider
+      ↓
+┌──────────┬──────────┬──────────┐
+│  Server  │ Database │ Network  │
+└──────────┴──────────┴──────────┘
+</code></pre>
+<p>Example:</p>
+<pre><code class="language-hcl">resource &quot;aws_instance&quot; &quot;server&quot; {
+  ami           = &quot;ami-xxxx&quot;
+  instance_type = &quot;t2.micro&quot;
+}
+</code></pre>
+<p>Terraform can then create/manage that infrastructure.</p>
+<h3 id="terraform-in-devops">Terraform in DevOps</h3>
+<p><strong>Code → Plan → Apply → Infrastructure</strong></p>
+<p>The major benefit is <strong>repeatability and automation</strong>: the same infrastructure configuration can be used across development, testing, and production environments.</p>
+</body>
+</html>
